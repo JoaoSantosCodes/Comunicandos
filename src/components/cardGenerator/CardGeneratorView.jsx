@@ -281,9 +281,11 @@ ${formData.closingText}
       }
     }
 
-    setCopied(true);
-    if (showToast) showToast(success ? "Texto formatado para WhatsApp copiado com sucesso!" : "Não foi possível copiar automaticamente.");
-    setTimeout(() => setCopied(false), 2000);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+    if (showToast) showToast(success ? "Texto formatado para WhatsApp copiado com sucesso!" : "Não foi possível copiar automaticamente.", success ? "success" : "error");
   };
 
   const handleDownloadPng = async () => {
