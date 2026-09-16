@@ -1,8 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { INITIAL_INCIDENTS, SYSTEM_CATALOG, PHRASE_LIBRARY, CARD_TEMPLATES, TEAMS_LIST } from "../data/mockData";
 import { StoreLookupModal } from "../components/stores/StoreLookupModal";
+import { NormalizeIncidentModal } from "../components/incidents/NormalizeIncidentModal";
+import { IncidentContext } from "./incidentContextInstance";
 
-const IncidentContext = createContext(null);
+// Date.now() sozinho colide quando duas entradas (ex: evento de timeline + log de
+// auditoria) são criadas na mesma sequência síncrona, dentro do mesmo milissegundo —
+// gerando chaves React duplicadas. O sufixo aleatório garante unicidade.
+const uniqueId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export const IncidentProvider = ({ children }) => {
   // Inicialização de estado sincronizada com Hash da URL para Deep-Linking
@@ -100,7 +105,7 @@ export const IncidentProvider = ({ children }) => {
 
   const addAuditLog = (action, target, detail) => {
     const newLog = {
-      id: `log-${Date.now()}`,
+      id: uniqueId("log"),
       time: new Date().toLocaleTimeString("pt-BR"),
       user: "João Carlos (Operador NOC)",
       action,
@@ -134,7 +139,7 @@ export const IncidentProvider = ({ children }) => {
       updatedAt: new Date().toISOString(),
       timeline: [
         {
-          id: `evt-${Date.now()}`,
+          id: uniqueId("evt"),
           time: nowTime,
           type: "criacao",
           title: "Incidente Registrado na Central de Comando",
@@ -156,7 +161,7 @@ export const IncidentProvider = ({ children }) => {
   const addTimelineEvent = (incidentId, event) => {
     const nowTime = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     const newEvt = {
-      id: `evt-${Date.now()}`,
+      id: uniqueId("evt"),
       time: nowTime,
       type: event.type || "atualizacao",
       title: event.title,
@@ -223,6 +228,25 @@ export const IncidentProvider = ({ children }) => {
       solucaoAplicada,
       causaRaizResolvida
     });
+  };
+
+  // Abre a modal de encerramento (Solução Aplicada / Causa Raiz) em vez de normalizar
+  // direto — é o que efetivamente liga encerrarIncidente() à UI. `redirectToDetail`
+  // é usado pela Sala de Crise, que precisa sair do war room após confirmar.
+  const [normalizeModal, setNormalizeModal] = useState(null); // { incidentId, redirectToDetail }
+
+  const requestNormalize = (incidentId, opts = {}) => {
+    setNormalizeModal({ incidentId, redirectToDetail: !!opts.redirectToDetail });
+  };
+
+  const handleConfirmNormalize = (solucaoAplicada, causaRaizResolvida) => {
+    if (!normalizeModal) return;
+    const { incidentId, redirectToDetail } = normalizeModal;
+    encerrarIncidente(incidentId, solucaoAplicada, causaRaizResolvida);
+    setNormalizeModal(null);
+    if (redirectToDetail) {
+      setActiveTab("incident-detail", incidentId);
+    }
   };
 
   const createCommunicationCard = (commData) => {
@@ -359,13 +383,21 @@ export const IncidentProvider = ({ children }) => {
         addAuditLog,
         isStoreModalOpen,
         setIsStoreModalOpen,
-        encerrarIncidente
+        encerrarIncidente,
+        requestNormalize
       }}
     >
       {children}
 
+      {/* Modal de Encerramento (Solução Aplicada / Causa Raiz) antes de normalizar */}
+      <NormalizeIncidentModal
+        incident={normalizeModal ? incidents.find(i => i.id === normalizeModal.incidentId) : null}
+        onCancel={() => setNormalizeModal(null)}
+        onConfirm={handleConfirmNormalize}
+      />
+
       {/* Modal Corporativo de Consulta de Lojas e VDs */}
-      <StoreLookupModal 
+      <StoreLookupModal
         isOpen={isStoreModalOpen} 
         onClose={() => setIsStoreModalOpen(false)} 
         onSelectStore={(store) => {
@@ -417,5 +449,3 @@ export const IncidentProvider = ({ children }) => {
     </IncidentContext.Provider>
   );
 };
-
-export const useIncidentContext = () => useContext(IncidentContext);

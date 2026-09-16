@@ -1,5 +1,5 @@
 import React from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { Search, Bell, Plus, ShieldAlert, Sparkles, Menu, Store } from "lucide-react";
 
 export const Header = ({ onToggleMobileMenu = () => {} }) => {

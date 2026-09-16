@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { Check, ArrowRight, ArrowLeft, ShieldAlert } from "lucide-react";
 
 export const IncidentWizardModal = () => {

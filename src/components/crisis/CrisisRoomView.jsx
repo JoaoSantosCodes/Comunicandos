@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { Flame, Users, CheckCircle2, Megaphone, Maximize2 } from "lucide-react";
 
 export const CrisisRoomView = () => {
-  const { getSelectedIncident, updateIncidentStatus, setActiveTab, setActiveCardDraft } = useIncidentContext();
+  const { getSelectedIncident, requestNormalize, setActiveTab, setActiveCardDraft } = useIncidentContext();
   const incident = getSelectedIncident();
 
   const [seconds, setSeconds] = useState(1420); // Elapsed timer simulation
@@ -32,10 +32,10 @@ export const CrisisRoomView = () => {
   };
 
   const handleNormalizeAndExit = () => {
-    updateIncidentStatus(incident.id, "normalizado");
-    // Sai da Sala de Crise para o painel do incidente já resolvido, em vez de
-    // deixar o banner "CRISE ATIVA" e o cronômetro SLA rodando indefinidamente.
-    setActiveTab("incident-detail", incident.id);
+    // Abre a modal de Solução Aplicada / Causa Raiz; ao confirmar, o context
+    // normaliza o incidente E sai da Sala de Crise para o painel resolvido,
+    // em vez de deixar o banner "CRISE ATIVA" e o cronômetro SLA rodando à toa.
+    requestNormalize(incident.id, { redirectToDetail: true });
   };
 
   const handleCreateUpdateCard = () => {

@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from "react";
-import { IncidentProvider, useIncidentContext } from "./context/IncidentContext";
+import { IncidentProvider } from "./context/IncidentContext";
+import { useIncidentContext } from "./context/useIncidentContext";
 import { Sidebar } from "./components/layout/Sidebar";
 import { Header } from "./components/layout/Header";
 import { MobileBottomNav } from "./components/layout/MobileBottomNav";

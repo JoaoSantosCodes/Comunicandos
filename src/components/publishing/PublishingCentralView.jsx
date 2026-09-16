@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { Send, CheckCircle2, ShieldCheck } from "lucide-react";
 
 export const PublishingCentralView = () => {

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { InstitutionalCardCanvas } from "./InstitutionalCardCanvas";
 import { toPng } from "html-to-image";
 import {

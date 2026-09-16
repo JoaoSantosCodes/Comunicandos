@@ -1,5 +1,5 @@
 import React from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { Clock } from "lucide-react";
 
 export const TimelineView = () => {

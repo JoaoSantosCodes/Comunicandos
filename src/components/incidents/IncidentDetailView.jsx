@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import {
   Clock,
   Megaphone,
@@ -15,7 +15,7 @@ import {
 export const IncidentDetailView = () => {
   const {
     getSelectedIncident,
-    updateIncidentStatus,
+    requestNormalize,
     addTimelineEvent,
     setActiveTab,
     setActiveCardDraft
@@ -89,7 +89,7 @@ export const IncidentDetailView = () => {
             <span>Gerar Card de Comunicado</span>
           </button>
           {incident.status !== "normalizado" && (
-            <button className="btn btn-success btn-sm" onClick={() => updateIncidentStatus(incident.id, "normalizado")}>
+            <button className="btn btn-success btn-sm" onClick={() => requestNormalize(incident.id)}>
               <CheckCircle2 size={16} />
               <span>Normalizar Incidente</span>
             </button>

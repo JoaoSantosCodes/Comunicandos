@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { Bot, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export const AiAssistantView = () => {
