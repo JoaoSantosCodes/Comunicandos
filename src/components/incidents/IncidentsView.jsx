@@ -18,7 +18,7 @@ export const IncidentsView = () => {
 
   const handleOpen = (id) => {
     setSelectedIncidentId(id);
-    setActiveTab("incident-detail");
+    setActiveTab("incident-detail", id);
   };
 
   return (

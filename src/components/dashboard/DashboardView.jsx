@@ -44,7 +44,7 @@ export const DashboardView = () => {
 
   const handleOpenIncident = (id) => {
     setSelectedIncidentId(id);
-    setActiveTab("incident-detail");
+    setActiveTab("incident-detail", id);
   };
 
   const handleCreateCardForIncident = (inc) => {

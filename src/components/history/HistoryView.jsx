@@ -41,7 +41,7 @@ export const HistoryView = () => {
               <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)" }}>{inc.system} • {inc.title}</h3>
               <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Início: {new Date(inc.startAt).toLocaleDateString("pt-BR")}</p>
             </div>
-            <button className="btn btn-secondary btn-sm" onClick={() => { setSelectedIncidentId(inc.id); setActiveTab("incident-detail"); }}>
+            <button className="btn btn-secondary btn-sm" onClick={() => { setSelectedIncidentId(inc.id); setActiveTab("incident-detail", inc.id); }}>
               <span>Ver Histórico</span>
               <ArrowRight size={14} />
             </button>

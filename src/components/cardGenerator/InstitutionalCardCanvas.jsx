@@ -366,13 +366,13 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
         {generatorMode === "cds" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderLeft: `3px solid ${styleConfig.bg}`, border: "1px solid #e2e8f0" }}>
+              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
                 <span style={{ fontSize: "0.68rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>UNIDADES IMPACTADAS</span>
                 <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>
                   {Array.isArray(affectedCDs) ? affectedCDs.join(", ") : affectedCDs}
                 </strong>
               </div>
-              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderLeft: `3px solid ${styleConfig.bg}`, border: "1px solid #e2e8f0" }}>
+              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
                 <span style={{ fontSize: "0.68rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>PROCESSO LOGÍSTICO</span>
                 <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{cdProcess}</strong>
               </div>
@@ -389,7 +389,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
         {/* MODE 3: EXECUTIVO BODY */}
         {generatorMode === "executivo" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", fontSize: "0.85rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#f1f5f9", padding: "12px", borderRadius: "8px", borderLeft: `4px solid ${styleConfig.bg}`, border: "1px solid #cbd5e1" }}>
+            <div style={{ backgroundColor: "#f1f5f9", padding: "12px", borderRadius: "8px", borderTop: "1px solid #cbd5e1", borderRight: "1px solid #cbd5e1", borderBottom: "1px solid #cbd5e1", borderLeft: `4px solid ${styleConfig.bg}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
                 <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#475569", textTransform: "uppercase" }}>IMPACTO DE NEGÓCIO</span>
                 <span style={{ fontSize: "0.7rem", fontWeight: 800, color: styleConfig.bg }}>ETA: {executiveEta}</span>
@@ -413,7 +413,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
         {/* MODE 4: MANUTENÇÃO BODY */}
         {generatorMode === "manutencao" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#eff6ff", padding: "12px", borderRadius: "8px", borderLeft: `4px solid ${styleConfig.bg}`, border: "1px solid #bfdbfe", textAlign: "center" }}>
+            <div style={{ backgroundColor: "#eff6ff", padding: "12px", borderRadius: "8px", borderTop: "1px solid #bfdbfe", borderRight: "1px solid #bfdbfe", borderBottom: "1px solid #bfdbfe", borderLeft: `4px solid ${styleConfig.bg}`, textAlign: "center" }}>
               <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#1d4ed8", textTransform: "uppercase", display: "block" }}>🗓️ JANELA DA MANUTENÇÃO PROGRAMADA</span>
               <strong style={{ fontSize: "0.95rem", color: "#1e40af" }}>{maintenanceWindow}</strong>
             </div>

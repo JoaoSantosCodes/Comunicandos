@@ -19,10 +19,15 @@ export const IncidentProvider = ({ children }) => {
   const [activeTab, setActiveTabState] = useState(initialRoute.tab);
   const [selectedIncidentId, setSelectedIncidentIdState] = useState(initialRoute.incidentId);
 
-  const setActiveTab = (tab) => {
+  // O 2º argumento permite passar o ID diretamente ao navegar para incident-detail,
+  // evitando ler `selectedIncidentId` de uma closure que pode estar obsoleta quando
+  // setSelectedIncidentId(id) e setActiveTab("incident-detail") são chamados em sequência
+  // no mesmo handler (ex: ao criar um incidente e abrir o painel dele na sequência).
+  const setActiveTab = (tab, incidentId) => {
     setActiveTabState(tab);
-    if (tab === "incident-detail" && selectedIncidentId) {
-      window.location.hash = `incident-detail/${selectedIncidentId}`;
+    const targetIncidentId = incidentId || selectedIncidentId;
+    if (tab === "incident-detail" && targetIncidentId) {
+      window.location.hash = `incident-detail/${targetIncidentId}`;
     } else {
       window.location.hash = tab;
     }
@@ -138,7 +143,7 @@ export const IncidentProvider = ({ children }) => {
     addAuditLog("Criação de Incidente", newId, `Criado incidente ${incidentData.system} - ${incidentData.title}`);
     showToast(`Incidente ${newId} criado com sucesso!`);
     setSelectedIncidentId(newId);
-    setActiveTab("incident-detail");
+    setActiveTab("incident-detail", newId);
     return newId;
   };
 
