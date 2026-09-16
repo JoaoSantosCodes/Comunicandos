@@ -11,12 +11,36 @@ import {
   Plus
 } from "lucide-react";
 
+const MTTR_TARGET_MINUTES = 120; // Meta de SLA: 2h de tempo médio de resolução
+
+const isSameCalendarDay = (dateStr) => {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+};
+
+const formatDurationMinutes = (totalMinutes) => {
+  const h = Math.floor(totalMinutes / 60);
+  const m = Math.round(totalMinutes % 60);
+  return `${h}h ${String(m).padStart(2, "0")}m`;
+};
+
 export const DashboardView = () => {
   const { incidents, communications, setActiveTab, setSelectedIncidentId, setActiveCardDraft } = useIncidentContext();
 
   const activeIncidents = incidents.filter(i => i.status !== "normalizado");
   const criticalIncidents = activeIncidents.filter(i => i.severity === "critica");
+  const inProgressIncidents = incidents.filter(i => i.status === "acompanhamento");
+  const normalizedIncidents = incidents.filter(i => i.status === "normalizado");
+  const normalizedTodayIncidents = normalizedIncidents.filter(i => isSameCalendarDay(i.updatedAt));
   const totalComms = communications.length;
+
+  const avgResolutionMinutes = normalizedIncidents.length > 0
+    ? normalizedIncidents.reduce((sum, i) => sum + (new Date(i.updatedAt) - new Date(i.startAt)) / 60000, 0) / normalizedIncidents.length
+    : 0;
+  const mttrLabel = normalizedIncidents.length > 0 ? formatDurationMinutes(avgResolutionMinutes) : "—";
+  const isMttrWithinTarget = normalizedIncidents.length === 0 || avgResolutionMinutes <= MTTR_TARGET_MINUTES;
 
   const handleOpenIncident = (id) => {
     setSelectedIncidentId(id);
@@ -84,7 +108,7 @@ export const DashboardView = () => {
             <Clock size={18} style={{ color: "#f59e0b" }} />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 800, color: "var(--text-main)", marginTop: "8px" }}>
-            07
+            {String(inProgressIncidents.length).padStart(2, "0")}
           </div>
           <p style={{ fontSize: "0.72rem", color: "#92660a", marginTop: "4px", fontWeight: 600 }}>
             SLA de atualização em dia
@@ -97,10 +121,10 @@ export const DashboardView = () => {
             <CheckCircle2 size={18} style={{ color: "#10b981" }} />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 800, color: "var(--text-main)", marginTop: "8px" }}>
-            18
+            {String(normalizedTodayIncidents.length).padStart(2, "0")}
           </div>
           <p style={{ fontSize: "0.72rem", color: "#0f7a56", marginTop: "4px", fontWeight: 600 }}>
-            +12% vs. média semanal
+            de {normalizedIncidents.length} normalizado(s) no total
           </p>
         </div>
 
@@ -123,10 +147,10 @@ export const DashboardView = () => {
             <TrendingUp size={18} style={{ color: "#8b5cf6" }} />
           </div>
           <div style={{ fontSize: "1.8rem", fontWeight: 800, color: "var(--text-main)", marginTop: "8px" }}>
-            01h 42m
+            {mttrLabel}
           </div>
-          <p style={{ fontSize: "0.72rem", color: "#7c3aed", marginTop: "4px", fontWeight: 600 }}>
-            Dentro da meta estabelecida
+          <p style={{ fontSize: "0.72rem", color: isMttrWithinTarget ? "#7c3aed" : "#b3261e", marginTop: "4px", fontWeight: 600 }}>
+            {isMttrWithinTarget ? "Dentro da meta estabelecida" : "Acima da meta estabelecida"} ({formatDurationMinutes(MTTR_TARGET_MINUTES)})
           </p>
         </div>
       </div>
