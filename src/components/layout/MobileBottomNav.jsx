@@ -33,12 +33,12 @@ export const MobileBottomNav = () => {
             className={`mobile-nav-item ${isActive ? "active" : ""}`}
           >
             <div style={{ position: "relative" }}>
-              <Icon size={20} color={isActive ? "#3b82f6" : item.isUrgent ? "#ef4444" : "#9ca3af"} />
+              <Icon size={20} color={isActive ? "#e2574c" : item.isUrgent ? "#f2867d" : "rgba(245,234,216,0.55)"} />
               {item.isUrgent && (
                 <span className="mobile-badge-dot"></span>
               )}
             </div>
-            <span style={{ fontSize: "0.68rem", fontWeight: isActive ? 800 : 500, color: isActive ? "#60a5fa" : "#9ca3af" }}>
+            <span style={{ fontSize: "0.68rem", fontWeight: isActive ? 800 : 500, color: isActive ? "var(--text-on-chrome)" : "rgba(245,234,216,0.55)" }}>
               {item.label}
             </span>
           </button>

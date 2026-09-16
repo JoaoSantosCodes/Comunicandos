@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, CheckCircle2, Info, Store, Truck, Briefcase, Wrench, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Store, Truck, Wrench, ShieldAlert } from "lucide-react";
 
 export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
   const {

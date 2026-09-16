@@ -1,6 +1,6 @@
 import React from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
-import { Megaphone, ExternalLink, Download } from "lucide-react";
+import { Megaphone, ExternalLink } from "lucide-react";
 
 export const CommunicationsView = () => {
   const { communications, setActiveTab, setActiveCardDraft } = useIncidentContext();
@@ -13,11 +13,11 @@ export const CommunicationsView = () => {
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
-          <Megaphone style={{ color: "#3b82f6" }} />
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", fontWeight: 400, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "10px" }}>
+          <Megaphone style={{ color: "#387fef" }} />
           COMUNICAÇÕES PUBLICADAS
         </h2>
-        <p style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
           Histórico de comunicados e cards emitidos pela Central de Comando.
         </p>
       </div>
@@ -28,18 +28,18 @@ export const CommunicationsView = () => {
             <div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
                 <span className={`status-badge ${comm.type}`}>{comm.type.toUpperCase()}</span>
-                <span style={{ fontSize: "0.75rem", color: "#6b7280" }}>{comm.id}</span>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>{comm.id}</span>
               </div>
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff", marginBottom: "6px" }}>
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)", marginBottom: "6px" }}>
                 {comm.title}
               </h3>
-              <p style={{ fontSize: "0.8rem", color: "#9ca3af" }}>
+              <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
                 {comm.impact}
               </p>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--border-color)", paddingTop: "10px" }}>
-              <span style={{ fontSize: "0.72rem", color: "#6b7280" }}>Canal: {comm.channel || "WhatsApp"}</span>
+              <span style={{ fontSize: "0.72rem", color: "var(--text-dim)" }}>Canal: {comm.channel || "WhatsApp"}</span>
               <button className="btn btn-secondary btn-sm" onClick={() => handleEdit(comm)}>
                 <ExternalLink size={14} />
                 <span>Ver / Editar</span>

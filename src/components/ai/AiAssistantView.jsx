@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
-import { Bot, Sparkles, ArrowRight, CheckCircle2, ShieldAlert, Zap } from "lucide-react";
+import { Bot, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export const AiAssistantView = () => {
-  const { parseNotesWithAi, createIncident, setActiveTab } = useIncidentContext();
+  const { parseNotesWithAi, createIncident } = useIncidentContext();
 
   const [rawText, setRawText] = useState(
     "sap voltou a apresentar problema na integracao de pedidos, wipro ja esta olhando a causa raiz no cdsp e cdmg, sem previsao de retorno ainda"
@@ -46,18 +46,18 @@ export const AiAssistantView = () => {
       <div className="panel-card" style={{ padding: "28px" }}>
         {/* Header */}
         <div style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "16px", marginBottom: "20px" }}>
-          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
-            <Bot style={{ color: "#a855f7" }} />
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", fontWeight: 400, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "10px" }}>
+            <Bot style={{ color: "#8b3fd1" }} />
             ASSISTENTE DE COMUNICAÇÃO IA (PARSER OPERACIONAL)
           </h2>
-          <p style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
             Transforme anotações informais em campos estruturados sem alterar os fatos fornecidos.
           </p>
         </div>
 
         {/* Quick Sample Buttons */}
         <div style={{ marginBottom: "16px" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a855f7", textTransform: "uppercase", display: "block", marginBottom: "8px" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#8b3fd1", textTransform: "uppercase", display: "block", marginBottom: "8px" }}>
             Exemplos Prontos para Testar com 1-Clique:
           </span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -70,10 +70,10 @@ export const AiAssistantView = () => {
                   handleAnalyze(sample.text);
                 }}
                 style={{
-                  backgroundColor: "#0b101d",
+                  backgroundColor: "var(--bg-dark-hover)",
                   border: "1px solid #8b5cf640",
-                  color: "#d8b4fe",
-                  borderRadius: "6px",
+                  color: "#7c3aed",
+                  borderRadius: "999px",
                   padding: "6px 12px",
                   fontSize: "0.78rem",
                   fontWeight: 600,
@@ -90,7 +90,7 @@ export const AiAssistantView = () => {
         <div className="form-group" style={{ marginBottom: "20px" }}>
           <label className="form-label" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span>Cole ou digite a anotação bruta:</span>
-            <span style={{ fontSize: "0.7rem", color: "#a855f7" }}>Zero Alucinação • Fatos Preservados</span>
+            <span style={{ fontSize: "0.7rem", color: "#8b3fd1" }}>Zero Alucinação • Fatos Preservados</span>
           </label>
           <textarea
             className="form-textarea"
@@ -113,28 +113,28 @@ export const AiAssistantView = () => {
 
         {/* Parsed Results Box */}
         {parsedData && (
-          <div style={{ marginTop: "28px", backgroundColor: "#0b101d", border: "1px solid #8b5cf6", borderRadius: "10px", padding: "20px" }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#c084fc", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ marginTop: "28px", backgroundColor: "var(--bg-dark-hover)", border: "1px solid #8b5cf6", borderRadius: "14px", padding: "20px" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#7c3aed", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
               <CheckCircle2 size={18} />
               CAMPOS ESTRUTURADOS EXTRAÍDOS
             </h3>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", fontSize: "0.85rem" }}>
-              <div style={{ backgroundColor: "#111827", padding: "10px 14px", borderRadius: "6px" }}>
-                <span style={{ color: "#9ca3af", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Sistema</span>
-                <span style={{ color: "#fff", fontWeight: 700 }}>{parsedData.system}</span>
+              <div style={{ backgroundColor: "var(--paper)", padding: "10px 14px", borderRadius: "10px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Sistema</span>
+                <span style={{ color: "var(--text-main)", fontWeight: 700 }}>{parsedData.system}</span>
               </div>
-              <div style={{ backgroundColor: "#111827", padding: "10px 14px", borderRadius: "6px" }}>
-                <span style={{ color: "#9ca3af", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Serviço / Processo</span>
-                <span style={{ color: "#fff", fontWeight: 700 }}>{parsedData.service}</span>
+              <div style={{ backgroundColor: "var(--paper)", padding: "10px 14px", borderRadius: "10px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Serviço / Processo</span>
+                <span style={{ color: "var(--text-main)", fontWeight: 700 }}>{parsedData.service}</span>
               </div>
-              <div style={{ backgroundColor: "#111827", padding: "10px 14px", borderRadius: "6px" }}>
-                <span style={{ color: "#9ca3af", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Abrangência Extraída</span>
-                <span style={{ color: "#60a5fa", fontWeight: 700 }}>{parsedData.scope.join(", ")}</span>
+              <div style={{ backgroundColor: "var(--paper)", padding: "10px 14px", borderRadius: "10px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Abrangência Extraída</span>
+                <span style={{ color: "#2f6ea8", fontWeight: 700 }}>{parsedData.scope.join(", ")}</span>
               </div>
-              <div style={{ backgroundColor: "#111827", padding: "10px 14px", borderRadius: "6px" }}>
-                <span style={{ color: "#9ca3af", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Responsável</span>
-                <span style={{ color: "#fff", fontWeight: 700 }}>{parsedData.responsible}</span>
+              <div style={{ backgroundColor: "var(--paper)", padding: "10px 14px", borderRadius: "10px" }}>
+                <span style={{ color: "var(--text-muted)", fontSize: "0.72rem", textTransform: "uppercase", fontWeight: 700, display: "block" }}>Responsável</span>
+                <span style={{ color: "var(--text-main)", fontWeight: 700 }}>{parsedData.responsible}</span>
               </div>
             </div>
 

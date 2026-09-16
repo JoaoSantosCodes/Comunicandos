@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
-import { Flame, Clock, Users, ShieldAlert, CheckCircle2, Megaphone, Plus, ArrowLeft } from "lucide-react";
+import { Flame, Users, CheckCircle2, Megaphone } from "lucide-react";
 
 export const CrisisRoomView = () => {
-  const { getSelectedIncident, updateIncidentStatus, addTimelineEvent, setActiveTab, setActiveCardDraft } = useIncidentContext();
+  const { getSelectedIncident, updateIncidentStatus, setActiveTab, setActiveCardDraft } = useIncidentContext();
   const incident = getSelectedIncident();
 
   const [seconds, setSeconds] = useState(1420); // Elapsed timer simulation
@@ -40,24 +40,24 @@ export const CrisisRoomView = () => {
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       {/* War Room Header */}
-      <div style={{ backgroundColor: "#7f1d1d", border: "2px solid #ef4444", borderRadius: "12px", padding: "20px 24px", color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ backgroundColor: "var(--accent-red-deep)", border: "2px solid var(--accent-red)", borderRadius: "20px", padding: "20px 24px", color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div style={{ width: "48px", height: "48px", borderRadius: "50%", backgroundColor: "#ef4444", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "48px", height: "48px", borderRadius: "50%", backgroundColor: "var(--accent-red)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Flame size={28} className="animate-pulse" />
           </div>
           <div>
-            <div style={{ fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#fca5a5" }}>
+            <div style={{ fontSize: "0.8rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#f2a39c" }}>
               🚨 SALA DE CRISE OPERACIONAL ATIVA — P1 CRÍTICO
             </div>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800 }}>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", fontWeight: 400 }}>
               {incident.id}: {incident.system} — {incident.title}
             </h1>
           </div>
         </div>
 
         {/* SLA Timer */}
-        <div style={{ textAlign: "right", backgroundColor: "rgba(0,0,0,0.4)", padding: "10px 18px", borderRadius: "8px" }}>
-          <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#fca5a5", textTransform: "uppercase" }}>Tempo Decorrido em Crise</div>
+        <div style={{ textAlign: "right", backgroundColor: "rgba(0,0,0,0.25)", padding: "10px 18px", borderRadius: "12px" }}>
+          <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#f2a39c", textTransform: "uppercase" }}>Tempo Decorrido em Crise</div>
           <div style={{ fontFamily: "monospace", fontSize: "1.6rem", fontWeight: 900, color: "#fff" }}>
             {formatTimer(seconds)}
           </div>
@@ -66,10 +66,10 @@ export const CrisisRoomView = () => {
 
       {/* Grid: Technical Roster & Live War Room Logs */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "20px" }}>
-        {/* Left: Technical Teams Roster */}
-        <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff", display: "flex", alignItems: "center", gap: "8px" }}>
-            <Users size={18} style={{ color: "#3b82f6" }} />
+        {/* Left: Technical Teams Roster — Crisis Room stays dark chrome by design */}
+        <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px", backgroundColor: "var(--chrome)", color: "var(--text-on-chrome)", border: "1px solid rgba(245,234,216,0.12)" }}>
+          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-on-chrome)", display: "flex", alignItems: "center", gap: "8px" }}>
+            <Users size={18} style={{ color: "#e2574c" }} />
             EQUIPES EM PONTE TÉCNICA
           </h3>
 
@@ -81,10 +81,10 @@ export const CrisisRoomView = () => {
               { name: "Gerência dos CDs", status: "Conectado", leader: "Gerente CDSP/CDMG" },
               { name: "Central de Comando NOC", status: "Facilitador", leader: "João Carlos (NOC)" }
             ].map((t, idx) => (
-              <div key={idx} style={{ backgroundColor: "#0b101d", padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div key={idx} style={{ backgroundColor: "var(--chrome-2)", padding: "10px 14px", borderRadius: "12px", border: "1px solid rgba(245,234,216,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#fff" }}>{t.name}</div>
-                  <div style={{ fontSize: "0.72rem", color: "#9ca3af" }}>{t.leader}</div>
+                  <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-on-chrome)" }}>{t.name}</div>
+                  <div style={{ fontSize: "0.72rem", color: "rgba(245,234,216,0.55)" }}>{t.leader}</div>
                 </div>
                 <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#34d399", backgroundColor: "rgba(16,185,129,0.15)", padding: "2px 8px", borderRadius: "99px" }}>
                   {t.status}
@@ -95,9 +95,9 @@ export const CrisisRoomView = () => {
         </div>
 
         {/* Right: Decision Logs & Actions */}
-        <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", backgroundColor: "var(--chrome)", color: "var(--text-on-chrome)", border: "1px solid rgba(245,234,216,0.12)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-on-chrome)" }}>
               Decisões & Plano de Ação em Execução
             </h3>
             <div style={{ display: "flex", gap: "8px" }}>
@@ -112,16 +112,16 @@ export const CrisisRoomView = () => {
             </div>
           </div>
 
-          <div style={{ backgroundColor: "#0b101d", padding: "16px", borderRadius: "8px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div style={{ backgroundColor: "var(--chrome-2)", padding: "16px", borderRadius: "12px", border: "1px solid rgba(245,234,216,0.1)", display: "flex", flexDirection: "column", gap: "12px" }}>
             <div style={{ display: "flex", gap: "10px" }}>
-              <span style={{ fontWeight: 800, color: "#f87171" }}>15:20</span>
-              <p style={{ fontSize: "0.85rem", color: "#e5e7eb" }}>
+              <span style={{ fontWeight: 800, color: "#f2867d" }}>15:20</span>
+              <p style={{ fontSize: "0.85rem", color: "rgba(245,234,216,0.85)" }}>
                 Aprovada manobra de reinício controlado do pool de instâncias do serviço EWM.
               </p>
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
               <span style={{ fontWeight: 800, color: "#fbbf24" }}>14:50</span>
-              <p style={{ fontSize: "0.85rem", color: "#e5e7eb" }}>
+              <p style={{ fontSize: "0.85rem", color: "rgba(245,234,216,0.85)" }}>
                 Identificada trava de locks de sessão no banco Oracle do ambiente SAP.
               </p>
             </div>

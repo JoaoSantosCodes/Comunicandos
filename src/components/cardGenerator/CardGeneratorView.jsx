@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
 import { InstitutionalCardCanvas } from "./InstitutionalCardCanvas";
 import { toPng } from "html-to-image";
@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Sparkles,
   Check,
-  Lock,
   Store,
   Truck,
   ShieldAlert,
@@ -27,6 +26,7 @@ import {
 export const CardGeneratorView = () => {
   const {
     activeCardDraft,
+    setActiveCardDraft,
     createCommunicationCard,
     phrases,
     setActiveTab
@@ -75,6 +75,40 @@ export const CardGeneratorView = () => {
     fullFooterImage: null,
     footerLogoHeight: 42 // Controlled footer logo height in px (25px to 70px)
   });
+
+  // Consome o rascunho vindo da Sala de Crise, Dashboard ou tela de Comunicações
+  // (aberto via setActiveCardDraft + navegação para esta aba) e popula o formulário.
+  useEffect(() => {
+    if (!activeCardDraft) return;
+
+    if (activeCardDraft.paragraphs) {
+      // Card já publicado (edição via tela de Comunicações): mesmo formato do formData.
+      setGeneratorMode(activeCardDraft.generatorMode || "cds");
+      setFormData(prev => ({ ...prev, ...activeCardDraft }));
+    } else {
+      // Rascunho rápido gerado a partir de um incidente (Dashboard / Sala de Crise).
+      const scopeText = Array.isArray(activeCardDraft.scope)
+        ? activeCardDraft.scope.join(", ")
+        : activeCardDraft.scope;
+
+      setGeneratorMode("cds");
+      setFormData(prev => ({
+        ...prev,
+        generatorMode: "cds",
+        type: activeCardDraft.type || prev.type,
+        title: activeCardDraft.title || prev.title,
+        cdProcess: activeCardDraft.process || prev.cdProcess,
+        paragraphs: [
+          `Sistema afetado: **${activeCardDraft.system}** (${activeCardDraft.process}). ${activeCardDraft.impact || ""}${scopeText ? ` Abrangência: ${scopeText}.` : ""}`,
+          activeCardDraft.status ? `Status atual: ${activeCardDraft.status}` : prev.paragraphs[1],
+          activeCardDraft.action || prev.paragraphs[2]
+        ].filter(Boolean)
+      }));
+    }
+
+    setActiveCardDraft(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCardDraft]);
 
   const handleModeSwitch = (newMode) => {
     setGeneratorMode(newMode);
@@ -247,7 +281,6 @@ ${formData.closingText}
   };
 
   const [showPhraseFlyout, setShowPhraseFlyout] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1); // 1, 1.1, 1.25
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -255,10 +288,10 @@ ${formData.closingText}
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800, color: "#fff" }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", fontWeight: 400, color: "var(--text-main)" }}>
               GERADOR DE CARDS OPERACIONAIS DPSP
             </h2>
-            <p style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
               Selecione o modo do card, use a biblioteca de frases prontas e personalize a paleta e logos.
             </p>
           </div>
@@ -269,13 +302,13 @@ ${formData.closingText}
               <button
                 className="btn btn-secondary"
                 onClick={() => setShowPhraseFlyout(!showPhraseFlyout)}
-                style={{ border: showPhraseFlyout ? "1px solid #a855f7" : "1px solid #374151" }}
+                style={{ border: showPhraseFlyout ? "1px solid #8b3fd1" : "1px solid var(--border-color)" }}
               >
-                <MessageSquare size={16} style={{ color: "#c084fc" }} />
+                <MessageSquare size={16} style={{ color: "#7c3aed" }} />
                 <span>Bibliot. Frases</span>
               </button>
 
-              {/* Photoshop Style Phrase Flyout Menu */}
+              {/* Phrase Flyout Menu */}
               {showPhraseFlyout && (
                 <div
                   style={{
@@ -285,11 +318,11 @@ ${formData.closingText}
                     marginTop: "8px",
                     width: "360px",
                     maxHeight: "380px",
-                    backgroundColor: "#0d1322",
-                    border: "1px solid #3b82f6",
-                    borderRadius: "12px",
+                    backgroundColor: "var(--paper)",
+                    border: "1px solid var(--border-color)",
+                    borderRadius: "16px",
                     padding: "12px",
-                    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.7)",
+                    boxShadow: "0 20px 40px rgba(32, 30, 29, 0.25)",
                     zIndex: 100,
                     overflowY: "auto",
                     display: "flex",
@@ -297,13 +330,13 @@ ${formData.closingText}
                     gap: "10px"
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1f293d", paddingBottom: "8px" }}>
-                    <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#60a5fa", display: "flex", alignItems: "center", gap: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "8px" }}>
+                    <span style={{ fontSize: "0.82rem", fontWeight: 800, color: "#2f6ea8", display: "flex", alignItems: "center", gap: "6px" }}>
                       <Sparkles size={14} /> Inserção Rápida de Frase
                     </span>
                     <button
                       onClick={() => setShowPhraseFlyout(false)}
-                      style={{ background: "none", border: "none", color: "#9ca3af", cursor: "pointer" }}
+                      style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
                     >
                       <X size={16} />
                     </button>
@@ -321,18 +354,18 @@ ${formData.closingText}
                           setShowPhraseFlyout(false);
                         }}
                         style={{
-                          backgroundColor: "#111827",
+                          backgroundColor: "var(--bg-dark-hover)",
                           padding: "10px",
-                          borderRadius: "8px",
-                          border: "1px solid #1f293d",
+                          borderRadius: "10px",
+                          border: "1px solid var(--border-color)",
                           cursor: "pointer",
                           fontSize: "0.8rem",
-                          color: "#e5e7eb",
+                          color: "var(--text-main)",
                           transition: "all 0.15s ease"
                         }}
                         className="hover:border-blue-500"
                       >
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "#3b82f6", fontWeight: 700, marginBottom: "2px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "#2f6ea8", fontWeight: 700, marginBottom: "2px" }}>
                           <span>{ph.category ? ph.category.toUpperCase() : "GERAL"}</span>
                           <span>+ Clique p/ Inserir</span>
                         </div>
@@ -376,18 +409,18 @@ ${formData.closingText}
                   padding: "12px 14px",
                   borderRadius: "10px",
                   border: isSel ? `2px solid ${m.color}` : "1px solid var(--border-color)",
-                  backgroundColor: isSel ? `${m.color}22` : "#0b101d",
-                  color: "#fff",
+                  backgroundColor: isSel ? `${m.color}18` : "var(--bg-dark-hover)",
+                  color: "var(--text-main)",
                   cursor: "pointer",
                   transition: "all 0.15s ease",
-                  boxShadow: isSel ? `0 4px 14px ${m.color}35` : "none"
+                  boxShadow: isSel ? `0 4px 14px ${m.color}25` : "none"
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 800, fontSize: "0.9rem", color: isSel ? m.color : "#f3f4f6" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 800, fontSize: "0.9rem", color: isSel ? m.color : "var(--text-main)" }}>
                   <IconComponent size={18} />
                   <span>{m.label}</span>
                 </div>
-                <span style={{ fontSize: "0.7rem", color: "#9ca3af", marginTop: "3px" }}>{m.desc}</span>
+                <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "3px" }}>{m.desc}</span>
               </button>
             );
           })}
@@ -399,10 +432,10 @@ ${formData.closingText}
         {/* COLUMN 1: DYNAMIC FORM PER MODE */}
         <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px" }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff" }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)" }}>
               Campos do Gerador de {generatorMode.toUpperCase()}
             </h3>
-            <span style={{ fontSize: "0.7rem", color: "#60a5fa", fontWeight: 700 }}>
+            <span style={{ fontSize: "0.7rem", color: "#2f6ea8", fontWeight: 700 }}>
               Modo {generatorMode.toUpperCase()} Ativo
             </span>
           </div>
@@ -467,9 +500,9 @@ ${formData.closingText}
 
           {/* MODE-SPECIFIC EXTRA FIELDS */}
           {generatorMode === "loja" && (
-            <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #0284c7" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #0284c7" }}>
               <div className="form-group" style={{ marginBottom: "10px" }}>
-                <label className="form-label" style={{ color: "#38bdf8" }}>Lojas / Regionais Afetadas</label>
+                <label className="form-label" style={{ color: "#0369a1" }}>Lojas / Regionais Afetadas</label>
                 <input
                   type="text"
                   className="form-input"
@@ -478,7 +511,7 @@ ${formData.closingText}
                 />
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ color: "#38bdf8" }}>Instrução Prática para a Loja</label>
+                <label className="form-label" style={{ color: "#0369a1" }}>Instrução Prática para a Loja</label>
                 <input
                   type="text"
                   className="form-input"
@@ -490,9 +523,9 @@ ${formData.closingText}
           )}
 
           {generatorMode === "cds" && (
-            <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #059669" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #059669" }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ color: "#34d399" }}>Processo Logístico / WMS</label>
+                <label className="form-label" style={{ color: "#0f7a56" }}>Processo Logístico / WMS</label>
                 <input
                   type="text"
                   className="form-input"
@@ -504,9 +537,9 @@ ${formData.closingText}
           )}
 
           {generatorMode === "executivo" && (
-            <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #dc2626" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #dc2626" }}>
               <div className="form-group" style={{ marginBottom: "10px" }}>
-                <label className="form-label" style={{ color: "#f87171" }}>Resumo do Impacto de Negócio</label>
+                <label className="form-label" style={{ color: "#b3261e" }}>Resumo do Impacto de Negócio</label>
                 <input
                   type="text"
                   className="form-input"
@@ -516,7 +549,7 @@ ${formData.closingText}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 120px", gap: "8px" }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ color: "#94a3b8" }}>Causa Raiz Técnica</label>
+                  <label className="form-label" style={{ color: "var(--text-muted)" }}>Causa Raiz Técnica</label>
                   <input
                     type="text"
                     className="form-input"
@@ -525,7 +558,7 @@ ${formData.closingText}
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ color: "#f87171" }}>ETA Solução</label>
+                  <label className="form-label" style={{ color: "#b3261e" }}>ETA Solução</label>
                   <input
                     type="text"
                     className="form-input"
@@ -538,9 +571,9 @@ ${formData.closingText}
           )}
 
           {generatorMode === "manutencao" && (
-            <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #2563eb" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #2563eb" }}>
               <div className="form-group" style={{ marginBottom: "10px" }}>
-                <label className="form-label" style={{ color: "#60a5fa" }}>Janela de Horário Programada</label>
+                <label className="form-label" style={{ color: "#2f6ea8" }}>Janela de Horário Programada</label>
                 <input
                   type="text"
                   className="form-input"
@@ -549,7 +582,7 @@ ${formData.closingText}
                 />
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ color: "#60a5fa" }}>Impacto Previsto Durante a Janela</label>
+                <label className="form-label" style={{ color: "#2f6ea8" }}>Impacto Previsto Durante a Janela</label>
                 <input
                   type="text"
                   className="form-input"
@@ -589,9 +622,9 @@ ${formData.closingText}
                     onClick={() => handleMoveParagraphUp(idx)}
                     title="Mover parágrafo para cima"
                     style={{
-                      backgroundColor: idx === 0 ? "#111827" : "#1f293d",
-                      border: "1px solid #374151",
-                      color: idx === 0 ? "#4b5563" : "#60a5fa",
+                      backgroundColor: idx === 0 ? "var(--paper)" : "var(--bg-dark-hover)",
+                      border: "1px solid var(--border-color)",
+                      color: idx === 0 ? "var(--text-dim)" : "#2f6ea8",
                       borderRadius: "4px",
                       padding: "3px",
                       cursor: idx === 0 ? "not-allowed" : "pointer"
@@ -605,9 +638,9 @@ ${formData.closingText}
                     onClick={() => handleMoveParagraphDown(idx)}
                     title="Mover parágrafo para baixo"
                     style={{
-                      backgroundColor: idx === formData.paragraphs.length - 1 ? "#111827" : "#1f293d",
-                      border: "1px solid #374151",
-                      color: idx === formData.paragraphs.length - 1 ? "#4b5563" : "#60a5fa",
+                      backgroundColor: idx === formData.paragraphs.length - 1 ? "var(--paper)" : "var(--bg-dark-hover)",
+                      border: "1px solid var(--border-color)",
+                      color: idx === formData.paragraphs.length - 1 ? "var(--text-dim)" : "#2f6ea8",
                       borderRadius: "4px",
                       padding: "3px",
                       cursor: idx === formData.paragraphs.length - 1 ? "not-allowed" : "pointer"
@@ -622,7 +655,7 @@ ${formData.closingText}
                     type="button"
                     onClick={() => handleRemoveParagraph(idx)}
                     title="Remover parágrafo"
-                    style={{ backgroundColor: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#f87171", borderRadius: "6px", padding: "8px", cursor: "pointer", height: "100%" }}
+                    style={{ backgroundColor: "rgba(200, 55, 45, 0.1)", border: "1px solid rgba(200, 55, 45, 0.25)", color: "#b3261e", borderRadius: "6px", padding: "8px", cursor: "pointer", height: "100%" }}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -635,8 +668,8 @@ ${formData.closingText}
         {/* COLUMN 2: LIVE WYSIWYG CANVAS PREVIEW WITH SMARTPHONE MOCKUP */}
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center", alignSelf: "flex-start", height: "fit-content" }}>
           {/* View Mode Switcher Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", backgroundColor: "#0b101d", padding: "6px 12px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
-            <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "6px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", backgroundColor: "var(--bg-dark-hover)", padding: "6px 12px", borderRadius: "12px", border: "1px solid var(--border-color)" }}>
+            <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "6px" }}>
               <span>Modo {generatorMode.toUpperCase()}</span>
               <span style={{ backgroundColor: "#10b981", color: "#fff", padding: "1px 6px", borderRadius: "4px", fontSize: "0.62rem" }}>
                 HD Canvas
@@ -654,8 +687,8 @@ ${formData.closingText}
                   fontWeight: 700,
                   border: "none",
                   cursor: "pointer",
-                  backgroundColor: viewDeviceMode === "canvas" ? "#3b82f6" : "transparent",
-                  color: viewDeviceMode === "canvas" ? "#fff" : "#9ca3af"
+                  backgroundColor: viewDeviceMode === "canvas" ? "var(--accent-red)" : "transparent",
+                  color: viewDeviceMode === "canvas" ? "#fff" : "var(--text-muted)"
                 }}
               >
                 🖼️ Canvas
@@ -670,7 +703,7 @@ ${formData.closingText}
                   border: "none",
                   cursor: "pointer",
                   backgroundColor: viewDeviceMode === "smartphone" ? "#10b981" : "transparent",
-                  color: viewDeviceMode === "smartphone" ? "#fff" : "#9ca3af"
+                  color: viewDeviceMode === "smartphone" ? "#fff" : "var(--text-muted)"
                 }}
               >
                 📱 Mobile (WhatsApp)
@@ -760,14 +793,14 @@ ${formData.closingText}
 
         {/* COLUMN 3: BRAND, PALETTE & LOGO SIZE CUSTOMIZER */}
         <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
-            <Sliders size={16} style={{ color: "#3b82f6" }} />
+          <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px", display: "flex", alignItems: "center", gap: "8px" }}>
+            <Sliders size={16} style={{ color: "#387fef" }} />
             Estilo, Cores & Marca
           </h3>
 
           {/* COLOR PALETTE PRESETS SELECTOR */}
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ color: "#a855f7" }}>🎨 Paleta de Cores do Card</label>
+            <label className="form-label" style={{ color: "#8b3fd1" }}>🎨 Paleta de Cores do Card</label>
             <select
               className="form-select"
               value={formData.palettePreset}
@@ -815,9 +848,9 @@ ${formData.closingText}
 
           {/* CUSTOM COLOR PICKERS IF CUSTOM PRESET */}
           {formData.palettePreset === "custom" && (
-            <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #a855f760", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #a855f760", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <div>
-                <label className="form-label" style={{ fontSize: "0.68rem", color: "#c084fc" }}>Badge Superior</label>
+                <label className="form-label" style={{ fontSize: "0.68rem", color: "#7c3aed" }}>Badge Superior</label>
                 <input
                   type="color"
                   className="form-input"
@@ -827,7 +860,7 @@ ${formData.closingText}
                 />
               </div>
               <div>
-                <label className="form-label" style={{ fontSize: "0.68rem", color: "#c084fc" }}>Caixa Suporte</label>
+                <label className="form-label" style={{ fontSize: "0.68rem", color: "#7c3aed" }}>Caixa Suporte</label>
                 <input
                   type="color"
                   className="form-input"
@@ -837,7 +870,7 @@ ${formData.closingText}
                 />
               </div>
               <div>
-                <label className="form-label" style={{ fontSize: "0.68rem", color: "#c084fc" }}>Texto Suporte</label>
+                <label className="form-label" style={{ fontSize: "0.68rem", color: "#7c3aed" }}>Texto Suporte</label>
                 <input
                   type="color"
                   className="form-input"
@@ -847,7 +880,7 @@ ${formData.closingText}
                 />
               </div>
               <div>
-                <label className="form-label" style={{ fontSize: "0.68rem", color: "#c084fc" }}>Fundo Externo</label>
+                <label className="form-label" style={{ fontSize: "0.68rem", color: "#7c3aed" }}>Fundo Externo</label>
                 <input
                   type="color"
                   className="form-input"
@@ -860,13 +893,13 @@ ${formData.closingText}
           )}
 
           {/* DYNAMIC LOGO RESIZER SLIDER */}
-          <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #3b82f640" }}>
+          <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #3b82f640" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
-              <label className="form-label" style={{ color: "#60a5fa", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+              <label className="form-label" style={{ color: "#2f6ea8", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
                 <Maximize2 size={14} />
                 Tamanho / Escala das Imagens
               </label>
-              <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "#fff" }}>{formData.footerLogoHeight}px</span>
+              <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "var(--text-main)" }}>{formData.footerLogoHeight}px</span>
             </div>
             <input
               type="range"
@@ -875,9 +908,9 @@ ${formData.closingText}
               step={1}
               value={formData.footerLogoHeight}
               onChange={(e) => setFormData({ ...formData, footerLogoHeight: Number(e.target.value) })}
-              style={{ width: "100%", cursor: "pointer", accentColor: "#3b82f6" }}
+              style={{ width: "100%", cursor: "pointer", accentColor: "var(--accent-red)" }}
             />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.65rem", color: "#6b7280", marginTop: "2px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.65rem", color: "var(--text-dim)", marginTop: "2px" }}>
               <span>Compacto (25px)</span>
               <span>Padrão (42px)</span>
               <span>Expandido (70px)</span>
@@ -908,9 +941,9 @@ ${formData.closingText}
 
           {/* Custom Footer Text Fields */}
           {formData.footerPreset === "custom" && (
-            <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "10px" }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ color: "#60a5fa" }}>Marca Esquerda (Texto)</label>
+                <label className="form-label" style={{ color: "#2f6ea8" }}>Marca Esquerda (Texto)</label>
                 <input
                   type="text"
                   className="form-input"
@@ -921,7 +954,7 @@ ${formData.closingText}
               </div>
 
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ color: "#60a5fa" }}>Marca Direita (Texto)</label>
+                <label className="form-label" style={{ color: "#2f6ea8" }}>Marca Direita (Texto)</label>
                 <input
                   type="text"
                   className="form-input"
@@ -934,32 +967,32 @@ ${formData.closingText}
           )}
 
           {/* IMAGE LOGO UPLOADERS SECTION */}
-          <div style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "8px", border: "1px solid #8b5cf640", display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#c084fc", display: "flex", alignItems: "center", gap: "6px" }}>
+          <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #8b5cf640", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#7c3aed", display: "flex", alignItems: "center", gap: "6px" }}>
               <ImageIcon size={14} />
               Upload de Logotipos em Imagem:
             </div>
 
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: "0.7rem", color: "#9ca3af" }}>Logo Esquerda (PNG/SVG):</label>
-              <input type="file" accept="image/*" onChange={handleLeftLogoUpload} style={{ fontSize: "0.75rem", color: "#9ca3af" }} />
+              <label className="form-label" style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Logo Esquerda (PNG/SVG):</label>
+              <input type="file" accept="image/*" onChange={handleLeftLogoUpload} style={{ fontSize: "0.75rem", color: "var(--text-muted)" }} />
             </div>
 
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: "0.7rem", color: "#9ca3af" }}>Logo Direita (PNG/SVG):</label>
-              <input type="file" accept="image/*" onChange={handleRightLogoUpload} style={{ fontSize: "0.75rem", color: "#9ca3af" }} />
+              <label className="form-label" style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Logo Direita (PNG/SVG):</label>
+              <input type="file" accept="image/*" onChange={handleRightLogoUpload} style={{ fontSize: "0.75rem", color: "var(--text-muted)" }} />
             </div>
 
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label" style={{ fontSize: "0.7rem", color: "#9ca3af" }}>Ou Banner Rodapé Completo (Imagem Única):</label>
-              <input type="file" accept="image/*" onChange={handleFullBannerUpload} style={{ fontSize: "0.75rem", color: "#9ca3af" }} />
+              <label className="form-label" style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Ou Banner Rodapé Completo (Imagem Única):</label>
+              <input type="file" accept="image/*" onChange={handleFullBannerUpload} style={{ fontSize: "0.75rem", color: "var(--text-muted)" }} />
             </div>
 
             {(formData.leftLogoImage || formData.rightLogoImage || formData.fullFooterImage) && (
               <button
                 className="btn btn-secondary btn-sm"
                 onClick={handleClearImages}
-                style={{ marginTop: "4px", color: "#f87171", display: "flex", alignItems: "center", gap: "6px" }}
+                style={{ marginTop: "4px", color: "#b3261e", display: "flex", alignItems: "center", gap: "6px" }}
               >
                 <X size={14} />
                 <span>Remover Imagens Carregadas</span>
@@ -968,7 +1001,7 @@ ${formData.closingText}
           </div>
 
           {/* Divider Bar Toggle */}
-          <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.8rem", color: "#d1d5db", cursor: "pointer" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.8rem", color: "var(--text-muted)", cursor: "pointer" }}>
             <input
               type="checkbox"
               checked={formData.showDivider}

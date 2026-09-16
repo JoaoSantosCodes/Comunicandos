@@ -20,10 +20,7 @@ import {
   Settings,
   Radio,
   ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  Layers,
-  Wrench
+  ChevronRight
 } from "lucide-react";
 
 export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
@@ -85,19 +82,16 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
 
       <aside className={`sidebar ${isOpen ? "open-mobile" : ""} ${isCollapsed ? "collapsed-dock" : ""}`}>
         {/* Photoshop Style Dock Header */}
-        <div style={{ padding: "16px 14px", borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "space-between" }}>
+        <div style={{ padding: "16px 14px", borderBottom: "1px solid rgba(245,234,216,0.1)", display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "34px", height: "34px", borderRadius: "8px", background: "linear-gradient(135deg, #003b71, #d91c24)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: "1.1rem", boxShadow: "0 4px 12px rgba(217, 28, 36, 0.3)" }}>
-              <Radio size={19} />
+            <div style={{ width: "34px", height: "34px", borderRadius: "11px", background: "var(--accent-red)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: "1.1rem" }}>
+              <Radio size={18} />
             </div>
             {!isCollapsed && (
               <div>
-                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "0.92rem", fontWeight: 800, color: "#fff", letterSpacing: "0.03em", lineHeight: 1.1 }}>
-                  CENTRAL <span style={{ color: "#d91c24" }}>DE COMANDO</span>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "0.85rem", fontWeight: 400, color: "var(--text-on-chrome)", letterSpacing: "0.02em", lineHeight: 1.15 }}>
+                  CENTRAL<br />DE COMANDO
                 </h1>
-                <p style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 500 }}>
-                  Photoshop Hub v2.5
-                </p>
               </div>
             )}
           </div>
@@ -114,12 +108,12 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
 
         {/* Status Bar */}
         {!isCollapsed && (
-          <div style={{ padding: "8px 16px", backgroundColor: "#090f1d", borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.7rem" }}>
+          <div style={{ padding: "8px 16px", backgroundColor: "var(--chrome-2)", borderBottom: "1px solid rgba(245,234,216,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.7rem" }}>
             <span style={{ display: "flex", alignItems: "center", gap: "6px", color: "#34d399", fontWeight: 600 }}>
               <span style={{ width: "7px", height: "7px", borderRadius: "50%", backgroundColor: "#10b981", boxShadow: "0 0 8px #10b981" }}></span>
               NOC ONLINE
             </span>
-            <span style={{ color: "var(--text-dim)", fontWeight: 600 }}>DPSP HUB</span>
+            <span style={{ color: "rgba(245,234,216,0.45)", fontWeight: 600 }}>DPSP HUB</span>
           </div>
         )}
 
@@ -128,7 +122,7 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
           {menuGroups.map((group, gIdx) => (
             <div key={gIdx} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
               {!isCollapsed && (
-                <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#475569", padding: "0 8px 4px 8px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "rgba(245,234,216,0.35)", padding: "0 8px 4px 8px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                   {group.title}
                 </span>
               )}
@@ -153,28 +147,28 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
                       borderRadius: "8px",
                       border: "none",
                       background: isActive
-                        ? "linear-gradient(90deg, rgba(59,130,246,0.25) 0%, rgba(59,130,246,0.08) 100%)"
+                        ? "linear-gradient(90deg, rgba(200,55,45,0.3) 0%, rgba(200,55,45,0.08) 100%)"
                         : item.isHighlight
                         ? "rgba(16, 185, 129, 0.12)"
                         : "transparent",
                       color: isActive
-                        ? "#60a5fa"
+                        ? "var(--text-on-chrome)"
                         : item.isUrgent
-                        ? "#f87171"
+                        ? "#f2867d"
                         : item.isHighlight
                         ? "#34d399"
-                        : "#9ca3af",
+                        : "rgba(245,234,216,0.55)",
                       fontWeight: isActive ? 700 : 500,
                       fontSize: "0.83rem",
                       cursor: "pointer",
                       textAlign: "left",
                       transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
-                      borderLeft: isActive ? "3px solid #3b82f6" : "3px solid transparent",
+                      borderLeft: isActive ? "3px solid #e2574c" : "3px solid transparent",
                       position: "relative"
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <Icon size={isCollapsed ? 20 : 17} style={{ color: isActive ? "#3b82f6" : item.isUrgent ? "#ef4444" : "inherit" }} />
+                      <Icon size={isCollapsed ? 20 : 17} style={{ color: isActive ? "#e2574c" : item.isUrgent ? "#f2867d" : "inherit" }} />
                       {!isCollapsed && <span>{item.label}</span>}
                     </div>
 
@@ -185,7 +179,7 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
                           borderRadius: "99px",
                           fontSize: "0.65rem",
                           fontWeight: 700,
-                          backgroundColor: item.badgeColor ? "#ef4444" : "#2563eb",
+                          backgroundColor: item.badgeColor ? "var(--accent-red-deep)" : "#e2574c",
                           color: "#ffffff"
                         }}
                       >
@@ -201,7 +195,7 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
 
                     {/* Tooltip Badge on Collapsed Dock */}
                     {isCollapsed && item.badge && (
-                      <span style={{ position: "absolute", top: "2px", right: "2px", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: item.badgeColor ? "#ef4444" : "#2563eb" }}></span>
+                      <span style={{ position: "absolute", top: "2px", right: "2px", width: "8px", height: "8px", borderRadius: "50%", backgroundColor: item.badgeColor ? "var(--accent-red-deep)" : "#e2574c" }}></span>
                     )}
                   </button>
                 );
@@ -211,16 +205,16 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
         </nav>
 
         {/* User Footer Profile */}
-        <div style={{ padding: isCollapsed ? "12px 8px" : "14px 16px", borderTop: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "10px", backgroundColor: "#0a0e19" }}>
-          <div style={{ width: "34px", height: "34px", borderRadius: "50%", backgroundColor: "#003b71", border: "2px solid #3b82f6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: "0.85rem" }}>
+        <div style={{ padding: isCollapsed ? "12px 8px" : "14px 16px", borderTop: "1px solid rgba(245,234,216,0.1)", display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "flex-start", gap: "10px", backgroundColor: "var(--chrome-2)" }}>
+          <div style={{ width: "34px", height: "34px", borderRadius: "50%", backgroundColor: "var(--chrome-3)", border: "2px solid #e2574c", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: "0.85rem" }}>
             JC
           </div>
           {!isCollapsed && (
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: "0.8rem", fontWeight: 700, color: "#f3f4f6", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <p style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--text-on-chrome)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 João Carlos
               </p>
-              <p style={{ fontSize: "0.68rem", color: "#6b7280" }}>Operador N3 / NOC</p>
+              <p style={{ fontSize: "0.68rem", color: "rgba(245,234,216,0.45)" }}>Operador N3 / NOC</p>
             </div>
           )}
         </div>

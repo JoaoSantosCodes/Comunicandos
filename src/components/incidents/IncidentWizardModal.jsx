@@ -3,7 +3,7 @@ import { useIncidentContext } from "../../context/IncidentContext";
 import { Check, ArrowRight, ArrowLeft, ShieldAlert } from "lucide-react";
 
 export const IncidentWizardModal = () => {
-  const { createIncident, setActiveTab, catalog } = useIncidentContext();
+  const { createIncident, setActiveTab } = useIncidentContext();
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -53,7 +53,7 @@ export const IncidentWizardModal = () => {
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px", marginBottom: "20px" }}>
           <div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.2rem", fontWeight: 400, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "10px" }}>
               <ShieldAlert style={{ color: "#ef4444" }} />
               REGISTRO DE NOVO INCIDENTE
             </h2>
@@ -74,7 +74,7 @@ export const IncidentWizardModal = () => {
               style={{
                 height: "6px",
                 borderRadius: "3px",
-                backgroundColor: s <= step ? "#3b82f6" : "#1f293d",
+                backgroundColor: s <= step ? "var(--accent-red)" : "rgba(32,30,29,0.1)",
                 transition: "all 0.2s"
               }}
             />
@@ -150,16 +150,16 @@ export const IncidentWizardModal = () => {
                       onClick={() => setFormData({ ...formData, severity: item.id })}
                       style={{
                         padding: "12px 8px",
-                        borderRadius: "8px",
-                        border: formData.severity === item.id ? "2px solid #3b82f6" : "1px solid var(--border-color)",
-                        backgroundColor: formData.severity === item.id ? "rgba(59, 130, 246, 0.15)" : "#0b101d",
-                        color: "#fff",
+                        borderRadius: "12px",
+                        border: formData.severity === item.id ? "2px solid var(--accent-red)" : "1px solid var(--border-color)",
+                        backgroundColor: formData.severity === item.id ? "rgba(200, 55, 45, 0.1)" : "var(--bg-dark-hover)",
+                        color: "var(--text-main)",
                         cursor: "pointer",
                         textAlign: "center"
                       }}
                     >
                       <div style={{ fontSize: "0.85rem", fontWeight: 700 }}>{item.label}</div>
-                      <div style={{ fontSize: "0.68rem", color: "#9ca3af", marginTop: "2px" }}>{item.desc}</div>
+                      <div style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginTop: "2px" }}>{item.desc}</div>
                     </button>
                   ))}
                 </div>
@@ -177,10 +177,10 @@ export const IncidentWizardModal = () => {
                         onClick={() => handleScopeToggle(sc)}
                         style={{
                           padding: "6px 12px",
-                          borderRadius: "6px",
-                          border: isSelected ? "1px solid #3b82f6" : "1px solid var(--border-color)",
-                          backgroundColor: isSelected ? "#1d4ed8" : "#0b101d",
-                          color: "#fff",
+                          borderRadius: "999px",
+                          border: isSelected ? "1px solid var(--accent-red)" : "1px solid var(--border-color)",
+                          backgroundColor: isSelected ? "var(--accent-red)" : "var(--bg-dark-hover)",
+                          color: isSelected ? "#fff" : "var(--text-main)",
                           fontSize: "0.8rem",
                           fontWeight: 600,
                           cursor: "pointer"
@@ -232,10 +232,10 @@ export const IncidentWizardModal = () => {
                         onClick={() => handleTeamToggle(tm)}
                         style={{
                           padding: "6px 12px",
-                          borderRadius: "6px",
+                          borderRadius: "999px",
                           border: isSelected ? "1px solid #10b981" : "1px solid var(--border-color)",
-                          backgroundColor: isSelected ? "rgba(16, 185, 129, 0.2)" : "#0b101d",
-                          color: isSelected ? "#34d399" : "#fff",
+                          backgroundColor: isSelected ? "rgba(16, 185, 129, 0.14)" : "var(--bg-dark-hover)",
+                          color: isSelected ? "#0f7a56" : "var(--text-main)",
                           fontSize: "0.8rem",
                           fontWeight: 600,
                           cursor: "pointer"
@@ -275,11 +275,11 @@ export const IncidentWizardModal = () => {
           {/* STEP 4: REVISÃO & CONFIRMAÇÃO */}
           {step === 4 && (
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div style={{ backgroundColor: "#0b101d", border: "1px solid var(--border-color)", padding: "16px", borderRadius: "8px" }}>
-                <h4 style={{ color: "#60a5fa", fontWeight: 700, fontSize: "0.95rem" }}>
+              <div style={{ backgroundColor: "var(--bg-dark-hover)", border: "1px solid var(--border-color)", padding: "16px", borderRadius: "12px" }}>
+                <h4 style={{ color: "#2f6ea8", fontWeight: 700, fontSize: "0.95rem" }}>
                   {formData.system} — {formData.title}
                 </h4>
-                <div style={{ marginTop: "10px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "0.8rem", color: "#9ca3af" }}>
+                <div style={{ marginTop: "10px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "0.8rem", color: "var(--text-muted)" }}>
                   <div><strong>Severidade:</strong> {formData.severity.toUpperCase()}</div>
                   <div><strong>Serviço:</strong> {formData.service}</div>
                   <div><strong>Abrangência:</strong> {formData.scope.join(", ")}</div>

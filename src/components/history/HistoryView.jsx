@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
-import { Archive, Search, ArrowRight } from "lucide-react";
+import { Archive, ArrowRight } from "lucide-react";
 
 export const HistoryView = () => {
   const { incidents, setSelectedIncidentId, setActiveTab } = useIncidentContext();
@@ -14,11 +14,11 @@ export const HistoryView = () => {
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
-          <Archive style={{ color: "#3b82f6" }} />
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.3rem", fontWeight: 400, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "10px" }}>
+          <Archive style={{ color: "#387fef" }} />
           HISTÓRICO & KNOWLEDGE BASE
         </h2>
-        <p style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
           Pesquisa histórica de ocorrências passadas para diagnóstico e reutilização.
         </p>
       </div>
@@ -37,9 +37,9 @@ export const HistoryView = () => {
         {filtered.map(inc => (
           <div key={inc.id} className="panel-card hoverable" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
-              <span style={{ fontSize: "0.78rem", color: "#60a5fa", fontWeight: 700 }}>{inc.id}</span>
-              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff" }}>{inc.system} • {inc.title}</h3>
-              <p style={{ fontSize: "0.8rem", color: "#9ca3af" }}>Início: {new Date(inc.startAt).toLocaleDateString("pt-BR")}</p>
+              <span style={{ fontSize: "0.78rem", color: "#2f6ea8", fontWeight: 700 }}>{inc.id}</span>
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)" }}>{inc.system} • {inc.title}</h3>
+              <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Início: {new Date(inc.startAt).toLocaleDateString("pt-BR")}</p>
             </div>
             <button className="btn btn-secondary btn-sm" onClick={() => { setSelectedIncidentId(inc.id); setActiveTab("incident-detail"); }}>
               <span>Ver Histórico</span>

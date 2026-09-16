@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
 import {
-  ShieldAlert,
   Clock,
   Megaphone,
   CheckCircle2,
@@ -103,7 +102,7 @@ export const IncidentDetailView = () => {
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-              <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "1rem", color: "#60a5fa" }}>
+              <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "1rem", color: "#2f6ea8" }}>
                 {incident.id}
               </span>
               <span className={`status-badge ${incident.severity}`}>
@@ -113,25 +112,25 @@ export const IncidentDetailView = () => {
                 {incident.status.toUpperCase()}
               </span>
             </div>
-            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800, color: "#fff" }}>
+            <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 400, color: "var(--text-main)" }}>
               {incident.system} • {incident.title}
             </h1>
-            <p style={{ color: "#9ca3af", fontSize: "0.85rem", marginTop: "4px" }}>
-              Serviço: <strong style={{ color: "#fff" }}>{incident.service}</strong> | Início: {new Date(incident.startAt).toLocaleString("pt-BR")}
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "4px" }}>
+              Serviço: <strong style={{ color: "var(--text-main)" }}>{incident.service}</strong> | Início: {new Date(incident.startAt).toLocaleString("pt-BR")}
             </p>
           </div>
 
-          <div style={{ backgroundColor: "#0b101d", padding: "12px 18px", borderRadius: "8px", border: "1px solid var(--border-color)", textAlign: "right" }}>
-            <div style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 700, textTransform: "uppercase" }}>Responsável Principal</div>
-            <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff", marginTop: "2px" }}>{incident.responsible}</div>
+          <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px 18px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
+            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Responsável Principal</div>
+            <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.responsible}</div>
           </div>
         </div>
 
         {/* Scope Chips */}
         <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: "10px", fontSize: "0.8rem" }}>
-          <span style={{ color: "#9ca3af", fontWeight: 600 }}>Abrangência:</span>
+          <span style={{ color: "var(--text-muted)", fontWeight: 600 }}>Abrangência:</span>
           {incident.scope.map(sc => (
-            <span key={sc} style={{ backgroundColor: "#1d4ed8", color: "#fff", padding: "2px 8px", borderRadius: "4px", fontWeight: 600, fontSize: "0.75rem" }}>
+            <span key={sc} style={{ backgroundColor: "#387fef", color: "#fff", padding: "2px 8px", borderRadius: "999px", fontWeight: 600, fontSize: "0.75rem" }}>
               {sc}
             </span>
           ))}
@@ -159,12 +158,12 @@ export const IncidentDetailView = () => {
                 padding: "8px 16px",
                 borderRadius: "8px 8px 0 0",
                 border: "none",
-                backgroundColor: isActive ? "#1f293d" : "transparent",
-                color: isActive ? "#60a5fa" : "#9ca3af",
+                backgroundColor: isActive ? "rgba(32,30,29,0.06)" : "transparent",
+                color: isActive ? "#2f6ea8" : "var(--text-muted)",
                 fontWeight: isActive ? 700 : 500,
                 fontSize: "0.85rem",
                 cursor: "pointer",
-                borderBottom: isActive ? "2px solid #3b82f6" : "2px solid transparent"
+                borderBottom: isActive ? "2px solid #387fef" : "2px solid transparent"
               }}
             >
               <Icon size={16} />
@@ -178,15 +177,15 @@ export const IncidentDetailView = () => {
       {subTab === "overview" && (
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "20px" }}>
           <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff" }}>Descrição & Diagnóstico</h3>
-            <p style={{ color: "#d1d5db", fontSize: "0.9rem", lineHeight: 1.6 }}>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)" }}>Descrição & Diagnóstico</h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", lineHeight: 1.6 }}>
               {incident.description || "Nenhum detalhamento fornecido."}
             </p>
 
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff", marginTop: "12px" }}>Componentes Envolvidos</h3>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)", marginTop: "12px" }}>Componentes Envolvidos</h3>
             <div style={{ display: "flex", gap: "8px" }}>
               {incident.components && incident.components.map(c => (
-                <span key={c} style={{ backgroundColor: "#0f172a", border: "1px solid var(--border-color)", padding: "6px 12px", borderRadius: "6px", fontSize: "0.82rem", fontWeight: 600, color: "#93c5fd" }}>
+                <span key={c} style={{ backgroundColor: "rgba(56,127,239,0.1)", border: "1px solid var(--border-color)", padding: "6px 12px", borderRadius: "999px", fontSize: "0.82rem", fontWeight: 600, color: "#2f6ea8" }}>
                   {c}
                 </span>
               ))}
@@ -194,7 +193,7 @@ export const IncidentDetailView = () => {
           </div>
 
           <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>Ações Operacionais</h3>
+            <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)" }}>Ações Operacionais</h3>
             <button className="btn btn-secondary" onClick={() => setShowEventModal(true)}>
               <Plus size={16} />
               <span>Adicionar Evento na Timeline</span>
@@ -211,7 +210,7 @@ export const IncidentDetailView = () => {
       {subTab === "timeline" && (
         <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "#fff" }}>Linha do Tempo do Incidente</h3>
+            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-main)" }}>Linha do Tempo do Incidente</h3>
             <button className="btn btn-primary btn-sm" onClick={() => setShowEventModal(true)}>
               <Plus size={14} />
               <span>Novo Evento</span>
@@ -219,19 +218,19 @@ export const IncidentDetailView = () => {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", position: "relative", paddingLeft: "24px" }}>
-            <div style={{ position: "absolute", left: "9px", top: "10px", bottom: "10px", width: "2px", backgroundColor: "#2b364e" }}></div>
+            <div style={{ position: "absolute", left: "9px", top: "10px", bottom: "10px", width: "2px", backgroundColor: "var(--border-hover)" }}></div>
 
             {incident.timeline && incident.timeline.map((evt) => (
               <div key={evt.id} style={{ position: "relative", display: "flex", flexDirection: "column", gap: "4px" }}>
-                <div style={{ position: "absolute", left: "-24px", top: "4px", width: "12px", height: "12px", borderRadius: "50%", backgroundColor: evt.type === 'normalizacao' ? '#10b981' : evt.type === 'comunicado' ? '#3b82f6' : '#f59e0b', border: "3px solid #111827" }}></div>
+                <div style={{ position: "absolute", left: "-24px", top: "4px", width: "12px", height: "12px", borderRadius: "50%", backgroundColor: evt.type === 'normalizacao' ? '#10b981' : evt.type === 'comunicado' ? '#387fef' : '#f59e0b', border: "3px solid var(--paper)" }}></div>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontWeight: 800, color: "#60a5fa", fontSize: "0.85rem" }}>{evt.time}</span>
-                  <span style={{ fontWeight: 700, color: "#fff", fontSize: "0.9rem" }}>{evt.title}</span>
+                  <span style={{ fontWeight: 800, color: "#2f6ea8", fontSize: "0.85rem" }}>{evt.time}</span>
+                  <span style={{ fontWeight: 700, color: "var(--text-main)", fontSize: "0.9rem" }}>{evt.title}</span>
                 </div>
-                <p style={{ color: "#9ca3af", fontSize: "0.82rem", backgroundColor: "#0b101d", padding: "10px 14px", borderRadius: "6px", border: "1px solid var(--border-color)", marginTop: "4px" }}>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.82rem", backgroundColor: "var(--bg-dark-hover)", padding: "10px 14px", borderRadius: "10px", border: "1px solid var(--border-color)", marginTop: "4px" }}>
                   {evt.description}
                 </p>
-                <span style={{ fontSize: "0.7rem", color: "#6b7280" }}>Registrado por {evt.author}</span>
+                <span style={{ fontSize: "0.7rem", color: "var(--text-dim)" }}>Registrado por {evt.author}</span>
               </div>
             ))}
           </div>
@@ -240,9 +239,9 @@ export const IncidentDetailView = () => {
 
       {/* EVENT ADD MODAL */}
       {showEventModal && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(32,30,29,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
           <div className="panel-card" style={{ width: "480px" }}>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#fff", marginBottom: "16px" }}>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-main)", marginBottom: "16px" }}>
               Adicionar Evento na Timeline
             </h3>
             <form onSubmit={handleAddEvent}>
