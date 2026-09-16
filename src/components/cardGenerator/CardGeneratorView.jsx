@@ -29,7 +29,8 @@ export const CardGeneratorView = () => {
     setActiveCardDraft,
     createCommunicationCard,
     phrases,
-    setActiveTab
+    setActiveTab,
+    showToast
   } = useIncidentContext();
 
   const canvasRef = useRef(null);
@@ -251,10 +252,37 @@ ${formData.closingText}
 📞 Em caso de dúvidas, entre em contato com o Suporte Service Desk: ${formData.contactPhone}`;
   };
 
-  const handleCopyWhatsappText = () => {
+  const handleCopyWhatsappText = async () => {
     const text = generateWhatsappFormattedText();
-    navigator.clipboard.writeText(text);
+    let success = false;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        success = true;
+      }
+    } catch {
+      // Fallback para navegadores com restrições de permissão de clipboard
+    }
+
+    if (!success) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        success = document.execCommand("copy");
+        document.body.removeChild(textArea);
+      } catch (err) {
+        console.error("Erro ao copiar texto:", err);
+      }
+    }
+
     setCopied(true);
+    if (showToast) showToast(success ? "Texto formatado para WhatsApp copiado com sucesso!" : "Não foi possível copiar automaticamente.");
     setTimeout(() => setCopied(false), 2000);
   };
 

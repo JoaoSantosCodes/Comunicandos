@@ -4,8 +4,48 @@ import { INITIAL_INCIDENTS, SYSTEM_CATALOG, PHRASE_LIBRARY, CARD_TEMPLATES, TEAM
 const IncidentContext = createContext(null);
 
 export const IncidentProvider = ({ children }) => {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [selectedIncidentId, setSelectedIncidentId] = useState("INC-20260915-001");
+  // Inicialização de estado sincronizada com Hash da URL para Deep-Linking
+  const parseInitialHash = () => {
+    const hash = window.location.hash.replace("#", "");
+    if (!hash) return { tab: "dashboard", incidentId: "INC-20260915-001" };
+    if (hash.startsWith("incident-detail/")) {
+      const parts = hash.split("/");
+      return { tab: "incident-detail", incidentId: parts[1] || "INC-20260915-001" };
+    }
+    return { tab: hash, incidentId: "INC-20260915-001" };
+  };
+
+  const initialRoute = parseInitialHash();
+  const [activeTab, setActiveTabState] = useState(initialRoute.tab);
+  const [selectedIncidentId, setSelectedIncidentIdState] = useState(initialRoute.incidentId);
+
+  const setActiveTab = (tab) => {
+    setActiveTabState(tab);
+    if (tab === "incident-detail" && selectedIncidentId) {
+      window.location.hash = `incident-detail/${selectedIncidentId}`;
+    } else {
+      window.location.hash = tab;
+    }
+  };
+
+  const setSelectedIncidentId = (id) => {
+    setSelectedIncidentIdState(id);
+    if (activeTab === "incident-detail") {
+      window.location.hash = `incident-detail/${id}`;
+    }
+  };
+
+  // Suporte a navegação por botões de voltar/avançar do navegador (hashchange)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { tab, incidentId } = parseInitialHash();
+      setActiveTabState(tab);
+      if (incidentId) setSelectedIncidentIdState(incidentId);
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const [incidents, setIncidents] = useState(() => {
     const saved = localStorage.getItem("comando_incidents");
@@ -48,8 +88,8 @@ export const IncidentProvider = ({ children }) => {
   }, [auditLogs]);
 
   const showToast = (msg, type = "success") => {
-    setToastMessage({ msg, type });
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage({ id: Date.now(), msg, type });
+    setTimeout(() => setToastMessage(null), 3500);
   };
 
   const addAuditLog = (action, target, detail) => {
@@ -275,11 +315,45 @@ export const IncidentProvider = ({ children }) => {
       }}
     >
       {children}
-      {/* Toast Notification Banner */}
+      {/* Toast Notification Banner Organic UI */}
       {toastMessage && (
-        <div style={{ position: "fixed", bottom: "24px", right: "24px", backgroundColor: "#0f172a", border: "1px solid #3b82f6", color: "#fff", padding: "12px 20px", borderRadius: "8px", boxShadow: "0 10px 25px rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", gap: "10px", fontSize: "0.88rem", fontWeight: 600 }} className="animate-fade-in">
-          <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "#10b981" }}></span>
-          {toastMessage.msg}
+        <div 
+          style={{ 
+            position: "fixed", 
+            bottom: "28px", 
+            right: "28px", 
+            backgroundColor: "var(--chrome)",
+            border: "1px solid rgba(245,234,216,0.15)",
+            color: "var(--text-on-chrome)",
+            padding: "14px 22px",
+            borderRadius: "12px",
+            boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            fontSize: "0.9rem",
+            fontWeight: 600,
+            fontFamily: "var(--font-sans)",
+            animation: "fadeIn 0.25s ease-out"
+          }}
+        >
+          <span
+            style={{
+              width: "10px",
+              height: "10px",
+              borderRadius: "50%",
+              backgroundColor: toastMessage.type === "error" ? "var(--accent-red)" : "#10b981",
+              boxShadow: toastMessage.type === "error" ? "0 0 8px #c8372d" : "0 0 8px #10b981"
+            }}
+          ></span>
+          <span>{toastMessage.msg}</span>
+          <button
+            onClick={() => setToastMessage(null)}
+            style={{ background: "none", border: "none", color: "rgba(245,234,216,0.55)", cursor: "pointer", marginLeft: "12px", padding: "2px" }}
+          >
+            ✕
+          </button>
         </div>
       )}
     </IncidentContext.Provider>

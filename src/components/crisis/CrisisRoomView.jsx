@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
-import { Flame, Users, CheckCircle2, Megaphone } from "lucide-react";
+import { Flame, Users, CheckCircle2, Megaphone, Maximize2 } from "lucide-react";
 
 export const CrisisRoomView = () => {
   const { getSelectedIncident, updateIncidentStatus, setActiveTab, setActiveCardDraft } = useIncidentContext();
   const incident = getSelectedIncident();
 
   const [seconds, setSeconds] = useState(1420); // Elapsed timer simulation
+  const [isKiosk, setIsKiosk] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setSeconds(s => s + 1), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => console.error(err));
+      setIsKiosk(true);
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      setIsKiosk(false);
+    }
+  };
 
   const formatTimer = (sec) => {
     const h = String(Math.floor(sec / 3600)).padStart(2, "0");
@@ -55,12 +66,34 @@ export const CrisisRoomView = () => {
           </div>
         </div>
 
-        {/* SLA Timer */}
-        <div style={{ textAlign: "right", backgroundColor: "rgba(0,0,0,0.25)", padding: "10px 18px", borderRadius: "12px" }}>
-          <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#f2a39c", textTransform: "uppercase" }}>Tempo Decorrido em Crise</div>
-          <div style={{ fontFamily: "monospace", fontSize: "1.6rem", fontWeight: 900, color: "#fff" }}>
-            {formatTimer(seconds)}
+        {/* SLA Timer & Kiosk Control */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ textAlign: "right", backgroundColor: "rgba(0,0,0,0.25)", padding: "10px 18px", borderRadius: "12px" }}>
+            <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#f2a39c", textTransform: "uppercase" }}>Tempo Decorrido em Crise</div>
+            <div style={{ fontFamily: "monospace", fontSize: "1.6rem", fontWeight: 900, color: "#fff" }}>
+              {formatTimer(seconds)}
+            </div>
           </div>
+          <button 
+            onClick={toggleFullscreen} 
+            title="Modo TV NOC (Tela Cheia)"
+            style={{ 
+              backgroundColor: "rgba(255,255,255,0.15)", 
+              border: "1px solid rgba(255,255,255,0.3)", 
+              color: "#fff", 
+              padding: "10px 14px", 
+              borderRadius: "12px", 
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: "0.8rem",
+              fontWeight: 700
+            }}
+          >
+            <Maximize2 size={16} />
+            <span>{isKiosk ? "Sair da TV" : "Modo TV"}</span>
+          </button>
         </div>
       </div>
 

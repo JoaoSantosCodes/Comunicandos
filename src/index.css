@@ -304,6 +304,10 @@ h1, h2, h3, .heading {
   animation: fadeIn 0.25s ease-out forwards;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Mobile Hamburger Button (Hidden on Desktop) */
 .mobile-menu-btn {
   display: none;
