@@ -31,6 +31,13 @@ export const CrisisRoomView = () => {
     return `${h}:${m}:${s}`;
   };
 
+  const handleNormalizeAndExit = () => {
+    updateIncidentStatus(incident.id, "normalizado");
+    // Sai da Sala de Crise para o painel do incidente já resolvido, em vez de
+    // deixar o banner "CRISE ATIVA" e o cronômetro SLA rodando indefinidamente.
+    setActiveTab("incident-detail", incident.id);
+  };
+
   const handleCreateUpdateCard = () => {
     setActiveCardDraft({
       incidentId: incident.id,
@@ -138,7 +145,12 @@ export const CrisisRoomView = () => {
                 <Megaphone size={14} />
                 <span>Publicar Comunicado de Crise</span>
               </button>
-              <button className="btn btn-success btn-sm" onClick={() => updateIncidentStatus(incident.id, "normalizado")}>
+              <button
+                className="btn btn-success btn-sm"
+                onClick={handleNormalizeAndExit}
+                disabled={incident.status === "normalizado"}
+                style={incident.status === "normalizado" ? { opacity: 0.6, cursor: "not-allowed" } : undefined}
+              >
                 <CheckCircle2 size={14} />
                 <span>Normalizar & Encerrar Crise</span>
               </button>
