@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, CheckCircle2, Store, Truck, Wrench, ShieldAlert, Calendar, Grid3x3, ListChecks } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Store, Truck, Wrench, ShieldAlert, Calendar, Grid3x3, ListChecks, Siren } from "lucide-react";
 
 const MODE_TAGS = {
   loja: "🏪 OPERAÇÃO DE LOJAS",
@@ -8,7 +8,8 @@ const MODE_TAGS = {
   manutencao: "🔧 MANUTENÇÃO TÉCNICA",
   flash: "⚡ FLASH DE VENDAS",
   malha: "🗺️ MALHA OPERACIONAL",
-  "malha-lojas": "🗺️ MALHA DE PREÇOS — LOJAS"
+  "malha-lojas": "🗺️ MALHA DE PREÇOS — LOJAS",
+  crise: "🚨 GESTÃO DE CRISE"
 };
 
 export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
@@ -32,6 +33,16 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
     malhaRows = [],
     malhaLojasCount = 0,
     malhaLojasChecklist = [],
+    crisisIncidentNumber = "",
+    crisisAffectedUnits = "",
+    crisisCause = "",
+    crisisTechnicalResponsible = "",
+    crisisCommandResponsible = "",
+    crisisRoomLink = "",
+    crisisTimeIncident = "",
+    crisisTimeActivation = "",
+    crisisTimeClosure = "",
+    crisisUpdateRows = [],
     closingText = "Agradecemos a compreensão.",
     signature = "CENTRAL DE COMANDO",
     // Color Palette Props
@@ -168,6 +179,8 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
   };
 
   const styleConfig = getTypeStyle();
+  // Gestão de Crise usa o ícone de sirene independente do tipo (indisponibilidade/atualização/etc)
+  if (generatorMode === "crise") styleConfig.Icon = Siren;
   const BadgeIconComponent = styleConfig.Icon;
   const activeHeaderTag = headerTag || styleConfig.defaultTag;
 
@@ -545,6 +558,81 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
                 </div>
               ))}
             </div>
+
+            {paragraphs.map((p, idx) => (
+              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
+                {renderFormattedText(p)}
+              </p>
+            ))}
+          </div>
+        )}
+
+        {/* MODE 8: GESTÃO DE CRISE — campos formais de abertura/encerramento + linha do tempo de atualizações */}
+        {generatorMode === "crise" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", fontSize: "0.85rem", color: "#334155" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
+                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>Nº DO INCIDENTE</span>
+                <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{crisisIncidentNumber || "—"}</strong>
+              </div>
+              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
+                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>UNIDADES AFETADAS</span>
+                <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{crisisAffectedUnits || "—"}</strong>
+              </div>
+            </div>
+
+            {crisisCause && (
+              <div style={{ backgroundColor: "#fafafa", padding: "10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>CAUSA</span>
+                <p style={{ margin: 0, fontSize: "0.8rem", color: "#334155" }}>{crisisCause}</p>
+              </div>
+            )}
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div style={{ fontSize: "0.78rem" }}>
+                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>RESP. TÉCNICO</span>
+                <strong style={{ color: "#0f172a" }}>{crisisTechnicalResponsible || "—"}</strong>
+              </div>
+              <div style={{ fontSize: "0.78rem" }}>
+                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>RESP. COMMAND</span>
+                <strong style={{ color: "#0f172a" }}>{crisisCommandResponsible || "—"}</strong>
+              </div>
+            </div>
+
+            {crisisRoomLink && (
+              <div style={{ fontSize: "0.78rem", color: styleConfig.bg, fontWeight: 700, wordBreak: "break-all" }}>
+                🔗 Sala de Crise: {crisisRoomLink}
+              </div>
+            )}
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px" }}>
+              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Incidente</span>
+                <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeIncident || "—"}</strong>
+              </div>
+              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Acionamento</span>
+                <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeActivation || "—"}</strong>
+              </div>
+              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Encerramento</span>
+                <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeClosure || "—"}</strong>
+              </div>
+            </div>
+
+            {crisisUpdateRows.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase" }}>LINHA DO TEMPO</span>
+                {crisisUpdateRows.map((row, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                    <span style={{ backgroundColor: styleConfig.bg, color: "#fff", fontWeight: 800, fontSize: "0.74rem", padding: "3px 8px", borderRadius: "6px", minWidth: "50px", textAlign: "center", flexShrink: 0 }}>
+                      {row.hora}
+                    </span>
+                    <span style={{ fontSize: "0.8rem", color: "#334155", lineHeight: 1.4 }}>{row.texto}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {paragraphs.map((p, idx) => (
               <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>

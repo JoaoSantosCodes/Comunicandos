@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useIncidentContext } from "../../context/useIncidentContext";
 import { STORES_CATALOG } from "../../data/storesData";
-import { FileCode, ArrowRight, Zap, Copy, Check } from "lucide-react";
+import { FileCode, ArrowRight, Zap, Copy, Check, PhoneCall } from "lucide-react";
 
 export const TemplatesView = () => {
   const { templates, setActiveTab, setActiveCardDraft, showToast } = useIncidentContext();
@@ -12,6 +12,10 @@ export const TemplatesView = () => {
   const [horaInicio, setHoraInicio] = useState("14:30");
   const [horaPrevisao, setHoraPrevisao] = useState("17:00");
   const [copiedKey, setCopiedKey] = useState(null);
+
+  // Estado do Gerador de Chamado Técnico (Vivo/Claro) — reaproveita a mesma loja selecionada acima
+  const [solicitanteNome, setSolicitanteNome] = useState("");
+  const [chamadoMotivo, setChamadoMotivo] = useState("Sem sinal de link/internet na loja");
 
   const selectedStoreObj = STORES_CATALOG.find(s => s.vd === selectedVd) || STORES_CATALOG[0];
 
@@ -84,6 +88,31 @@ export const TemplatesView = () => {
 👤 *GGL:* ${selectedStoreObj.ggl}`;
   };
 
+  // Geradores de Texto de Abertura de Chamado Técnico (Vivo & Claro) — seção 3.2 da
+  // documentação de referência: localizar a loja e gerar o texto pronto para abertura
+  // de chamado junto à operadora, já com contatos de GGL/GR preenchidos.
+  const getChamadoVivoText = () => {
+    return `📋 *ABERTURA DE CHAMADO — OPERADORA VIVO*
+📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+👤 *Solicitante:* ${solicitanteNome || "Central de Comando DPSP"}
+⚠️ *Motivo:* ${chamadoMotivo}
+👤 *GGL:* ${selectedStoreObj.ggl}${selectedStoreObj.gglPhone && selectedStoreObj.gglPhone !== "-" ? ` (${selectedStoreObj.gglPhone})` : ""}
+📞 *GR:* ${selectedStoreObj.gr}${selectedStoreObj.grPhone && selectedStoreObj.grPhone !== "-" ? ` (${selectedStoreObj.grPhone})` : ""}
+
+*Solicitamos abertura de chamado técnico emergencial para verificação e correção do circuito da loja acima.*`;
+  };
+
+  const getChamadoClaroText = () => {
+    return `📋 *ABERTURA DE CHAMADO — OPERADORA CLARO*
+📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+👤 *Solicitante:* ${solicitanteNome || "Central de Comando DPSP"}
+⚠️ *Motivo:* ${chamadoMotivo}
+👤 *GGL:* ${selectedStoreObj.ggl}${selectedStoreObj.gglPhone && selectedStoreObj.gglPhone !== "-" ? ` (${selectedStoreObj.gglPhone})` : ""}
+📞 *GR:* ${selectedStoreObj.gr}${selectedStoreObj.grPhone && selectedStoreObj.grPhone !== "-" ? ` (${selectedStoreObj.grPhone})` : ""}
+
+*Solicitamos abertura de chamado técnico emergencial para verificação e correção do circuito da loja acima.*`;
+  };
+
   const handleCopyText = async (text, keyName) => {
     let success = false;
     try {
@@ -123,6 +152,11 @@ export const TemplatesView = () => {
     { key: "e_fechada", title: "🟢 Normalização: Energia Restabelecida", text: getEnergiaFechamentoText(), color: "#10b981" },
     { key: "l_aberta", title: "🌐 Abertura: Queda de Link / Internet", text: getLinkAberturaText(), color: "#387fef" },
     { key: "l_fechada", title: "🟢 Normalização: Link Restabelecido", text: getLinkFechamentoText(), color: "#10b981" }
+  ];
+
+  const chamadoBlocks = [
+    { key: "c_vivo", title: "📋 Chamado — Operadora Vivo", text: getChamadoVivoText(), color: "#8b3fd1" },
+    { key: "c_claro", title: "📋 Chamado — Operadora Claro", text: getChamadoClaroText(), color: "#dc2626" }
   ];
 
   return (
@@ -187,6 +221,58 @@ export const TemplatesView = () => {
         {/* 4 Generated Code Blocks */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginTop: "8px" }}>
           {isoladaBlocks.map(block => (
+            <div key={block.key} style={{ backgroundColor: "var(--bg-dark-hover)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "14px", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: block.color }}>{block.title}</span>
+                <button className="btn btn-secondary btn-sm" onClick={() => handleCopyText(block.text, block.key)} style={{ padding: "4px 8px", fontSize: "0.72rem" }}>
+                  {copiedKey === block.key ? <Check size={12} style={{ color: "#10b981" }} /> : <Copy size={12} />}
+                  <span>{copiedKey === block.key ? "Copiado!" : "Copiar"}</span>
+                </button>
+              </div>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontFamily: "'SF Mono', 'Consolas', monospace", fontSize: "0.78rem", color: "var(--text-muted)", backgroundColor: "rgba(0,0,0,0.25)", padding: "10px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+                {block.text}
+              </pre>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* MÓDULO GERADOR DE CHAMADO TÉCNICO (VIVO & CLARO) */}
+      <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", borderLeft: "4px solid #8b3fd1" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "12px" }}>
+          <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "8px" }}>
+            <PhoneCall size={18} style={{ color: "#8b3fd1" }} />
+            GERADOR DE CHAMADO TÉCNICO (VIVO & CLARO)
+          </h3>
+          <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#8b3fd1", backgroundColor: "rgba(139,63,209,0.1)", padding: "2px 8px", borderRadius: "99px" }}>
+            Usa a loja selecionada acima
+          </span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label" style={{ fontSize: "0.78rem" }}>Seu Nome (Solicitante):</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Opcional — aparece no texto do chamado"
+              value={solicitanteNome}
+              onChange={(e) => setSolicitanteNome(e.target.value)}
+            />
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label" style={{ fontSize: "0.78rem" }}>Motivo do Chamado:</label>
+            <input
+              type="text"
+              className="form-input"
+              value={chamadoMotivo}
+              onChange={(e) => setChamadoMotivo(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+          {chamadoBlocks.map(block => (
             <div key={block.key} style={{ backgroundColor: "var(--bg-dark-hover)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "14px", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "10px" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: "0.82rem", fontWeight: 700, color: block.color }}>{block.title}</span>

@@ -23,7 +23,8 @@ import {
   ChevronDown,
   Calendar,
   Grid3x3,
-  ListChecks
+  ListChecks,
+  Siren
 } from "lucide-react";
 
 export const CardGeneratorView = () => {
@@ -72,6 +73,18 @@ export const CardGeneratorView = () => {
       { label: "Balcão", done: false },
       { label: "Frente de Caixa (PDV)", done: false },
       { label: "Etiquetagem de Produtos", done: false }
+    ],
+    crisisIncidentNumber: "INC-000000",
+    crisisAffectedUnits: "CDSP, CDMG",
+    crisisCause: "Em apuração pela equipe técnica.",
+    crisisTechnicalResponsible: "Equipe Infraestrutura",
+    crisisCommandResponsible: "Central de Comando",
+    crisisRoomLink: "",
+    crisisTimeIncident: "",
+    crisisTimeActivation: "",
+    crisisTimeClosure: "",
+    crisisUpdateRows: [
+      { hora: "14:00", texto: "Incidente identificado e equipe técnica acionada." }
     ],
     closingText: "Agradecemos a compreensão.",
     signature: "CENTRAL DE COMANDO",
@@ -189,6 +202,14 @@ export const CardGeneratorView = () => {
         "Checklist cobre balcão, frente de caixa (PDV) e etiquetagem de produtos.",
         "Central de Comando consolidando o retorno das lojas."
       ];
+    } else if (newMode === "crise") {
+      newHeader = "ALERTA DE GESTÃO DE CRISE";
+      newTitle = "ABERTURA FORMAL DE INCIDENTE CRÍTICO";
+      newParagraphs = [
+        "Incidente crítico identificado e formalmente registrado pela Central de Comando.",
+        "Sala de crise acionada com responsáveis técnico e de Command designados.",
+        "Atualizações serão publicadas conforme evolução do atendimento."
+      ];
     }
 
     setFormData(prev => ({
@@ -259,6 +280,22 @@ export const CardGeneratorView = () => {
       updated[idx] = { ...updated[idx], done: !updated[idx].done };
       return { ...prev, malhaLojasChecklist: updated };
     });
+  };
+
+  const handleAddCrisisUpdateRow = () => {
+    setFormData(prev => ({ ...prev, crisisUpdateRows: [...prev.crisisUpdateRows, { hora: "", texto: "" }] }));
+  };
+
+  const handleCrisisUpdateRowChange = (idx, field, value) => {
+    setFormData(prev => {
+      const updated = [...prev.crisisUpdateRows];
+      updated[idx] = { ...updated[idx], [field]: value };
+      return { ...prev, crisisUpdateRows: updated };
+    });
+  };
+
+  const handleRemoveCrisisUpdateRow = (idx) => {
+    setFormData(prev => ({ ...prev, crisisUpdateRows: prev.crisisUpdateRows.filter((_, i) => i !== idx) }));
   };
 
   const handleParagraphChange = (index, value) => {
@@ -491,7 +528,8 @@ ${formData.closingText}
             { id: "manutencao", label: "4. MANUTENÇÃO", icon: Wrench, desc: "Para Janelas Programadas TI", color: "#2563eb" },
             { id: "flash", label: "5. FLASH DE VENDAS", icon: Calendar, desc: "Checklist de Plantão por Horário", color: "#0891b2" },
             { id: "malha", label: "6. MALHA OPERACIONAL", icon: Grid3x3, desc: "Acompanhamento de Malha de Preços", color: "#7c3aed" },
-            { id: "malha-lojas", label: "7. MALHA LOJAS", icon: ListChecks, desc: "Checklist de Execução nas Lojas", color: "#0f7a56" }
+            { id: "malha-lojas", label: "7. MALHA LOJAS", icon: ListChecks, desc: "Checklist de Execução nas Lojas", color: "#0f7a56" },
+            { id: "crise", label: "8. GESTÃO DE CRISE", icon: Siren, desc: "Abertura/Encerramento Formal de Crise", color: "#991b1b" }
           ].map(m => {
             const IconComponent = m.icon;
             const isSel = generatorMode === m.id;
@@ -547,13 +585,13 @@ ${formData.closingText}
                   const newType = e.target.value;
                   const modeLabel = {
                     loja: "LOJAS", cds: "CDs", executivo: "EXECUTIVO", manutencao: "TI",
-                    flash: "FLASH DE VENDAS", malha: "MALHA OPERACIONAL", "malha-lojas": "MALHA LOJAS"
+                    flash: "FLASH DE VENDAS", malha: "MALHA OPERACIONAL", "malha-lojas": "MALHA LOJAS", crise: "GESTÃO DE CRISE"
                   }[generatorMode] || "STATUS";
                   const tagMap = {
-                    indisponibilidade: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : `INDISPONIBILIDADE — ${modeLabel}!`,
-                    atualizacao: generatorMode === "loja" ? "ATUALIZAÇÃO DE STATUS - LOJAS!" : generatorMode === "cds" ? "ATUALIZAÇÃO LOGÍSTICA!" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO DE INCIDENTE" : `ATUALIZAÇÃO — ${modeLabel}!`,
-                    normalizacao: generatorMode === "loja" ? "LOJAS NORMALIZADAS!" : generatorMode === "cds" ? "LOGÍSTICA NORMALIZADA!" : generatorMode === "executivo" ? "SERVIÇO EXECUTIVO NORMALIZADO!" : generatorMode === "manutencao" ? "MANUTENÇÃO CONCLUÍDA!" : `${modeLabel} FINALIZADA!`,
-                    manutencao: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA CDs!" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : "MANUTENÇÃO PROGRAMADA!"
+                    indisponibilidade: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : generatorMode === "crise" ? "CRISE ABERTA — INDISPONIBILIDADE" : `INDISPONIBILIDADE — ${modeLabel}!`,
+                    atualizacao: generatorMode === "loja" ? "ATUALIZAÇÃO DE STATUS - LOJAS!" : generatorMode === "cds" ? "ATUALIZAÇÃO LOGÍSTICA!" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO DE INCIDENTE" : generatorMode === "crise" ? "ATUALIZAÇÃO DE CRISE" : `ATUALIZAÇÃO — ${modeLabel}!`,
+                    normalizacao: generatorMode === "loja" ? "LOJAS NORMALIZADAS!" : generatorMode === "cds" ? "LOGÍSTICA NORMALIZADA!" : generatorMode === "executivo" ? "SERVIÇO EXECUTIVO NORMALIZADO!" : generatorMode === "manutencao" ? "MANUTENÇÃO CONCLUÍDA!" : generatorMode === "crise" ? "CRISE ENCERRADA — NORMALIZADO" : `${modeLabel} FINALIZADA!`,
+                    manutencao: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA CDs!" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : generatorMode === "crise" ? "CRISE — MANUTENÇÃO EMERGENCIAL" : "MANUTENÇÃO PROGRAMADA!"
                   };
                   setFormData({
                     ...formData,
@@ -785,6 +823,95 @@ ${formData.closingText}
                     <input type="checkbox" checked={item.done} onChange={() => handleToggleMalhaLojasItem(idx)} />
                     {item.label} {item.done ? "✅" : "⌛"}
                   </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* GESTÃO DE CRISE: campos formais de abertura/encerramento + linha do tempo de atualizações */}
+          {generatorMode === "crise" && (
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #991b1b" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b" }}>Nº do Incidente</label>
+                  <input type="text" className="form-input" value={formData.crisisIncidentNumber} onChange={(e) => setFormData({ ...formData, crisisIncidentNumber: e.target.value })} />
+                </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b" }}>Unidades Afetadas</label>
+                  <input type="text" className="form-input" value={formData.crisisAffectedUnits} onChange={(e) => setFormData({ ...formData, crisisAffectedUnits: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: "10px" }}>
+                <label className="form-label" style={{ color: "#991b1b" }}>Causa</label>
+                <input type="text" className="form-input" value={formData.crisisCause} onChange={(e) => setFormData({ ...formData, crisisCause: e.target.value })} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b" }}>Responsável Técnico</label>
+                  <input type="text" className="form-input" value={formData.crisisTechnicalResponsible} onChange={(e) => setFormData({ ...formData, crisisTechnicalResponsible: e.target.value })} />
+                </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b" }}>Responsável Command</label>
+                  <input type="text" className="form-input" value={formData.crisisCommandResponsible} onChange={(e) => setFormData({ ...formData, crisisCommandResponsible: e.target.value })} />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: "10px" }}>
+                <label className="form-label" style={{ color: "#991b1b" }}>Link da Sala de Crise</label>
+                <input type="text" className="form-input" placeholder="https://..." value={formData.crisisRoomLink} onChange={(e) => setFormData({ ...formData, crisisRoomLink: e.target.value })} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b", fontSize: "0.72rem" }}>Hora Incidente</label>
+                  <input type="text" className="form-input" value={formData.crisisTimeIncident} onChange={(e) => setFormData({ ...formData, crisisTimeIncident: e.target.value })} />
+                </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b", fontSize: "0.72rem" }}>Hora Acionamento</label>
+                  <input type="text" className="form-input" value={formData.crisisTimeActivation} onChange={(e) => setFormData({ ...formData, crisisTimeActivation: e.target.value })} />
+                </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ color: "#991b1b", fontSize: "0.72rem" }}>Hora Encerramento</label>
+                  <input type="text" className="form-input" value={formData.crisisTimeClosure} onChange={(e) => setFormData({ ...formData, crisisTimeClosure: e.target.value })} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                <label className="form-label" style={{ color: "#991b1b", margin: 0 }}>Linhas de Atualização (Histórico)</label>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={handleAddCrisisUpdateRow}>
+                  <Plus size={12} />
+                  <span>Linha</span>
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {formData.crisisUpdateRows.map((row, idx) => (
+                  <div key={idx} style={{ display: "flex", gap: "6px" }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ width: "80px", flexShrink: 0 }}
+                      placeholder="14:00"
+                      value={row.hora}
+                      onChange={(e) => handleCrisisUpdateRowChange(idx, "hora", e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Texto da atualização..."
+                      value={row.texto}
+                      onChange={(e) => handleCrisisUpdateRowChange(idx, "texto", e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveCrisisUpdateRow(idx)}
+                      title="Remover linha"
+                      style={{ backgroundColor: "rgba(200, 55, 45, 0.1)", border: "1px solid rgba(200, 55, 45, 0.25)", color: "#b3261e", borderRadius: "6px", padding: "8px", cursor: "pointer", flexShrink: 0 }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
