@@ -4,7 +4,11 @@ import { Clock } from "lucide-react";
 
 export const TimelineView = () => {
   const { incidents } = useIncidentContext();
-  const allEvents = incidents.flatMap(i => (i.timeline || []).map(t => ({ ...t, incidentId: i.id, system: i.system, incidentTitle: i.title })));
+  // Ordena por horário (mais recente primeiro) em vez de apenas concatenar por incidente,
+  // já que flatMap por si só agrupa os eventos por incidente e não produz uma timeline global.
+  const allEvents = incidents
+    .flatMap(i => (i.timeline || []).map(t => ({ ...t, incidentId: i.id, system: i.system, incidentTitle: i.title })))
+    .sort((a, b) => b.time.localeCompare(a.time));
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>

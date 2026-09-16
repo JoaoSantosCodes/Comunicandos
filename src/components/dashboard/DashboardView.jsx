@@ -244,7 +244,7 @@ export const DashboardView = () => {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            {incidents.flatMap(i => i.timeline.map(t => ({ ...t, incidentId: i.id, system: i.system }))).slice(0, 5).map(evt => (
+            {incidents.flatMap(i => i.timeline.map(t => ({ ...t, incidentId: i.id, system: i.system }))).sort((a, b) => b.time.localeCompare(a.time)).slice(0, 5).map(evt => (
               <div key={evt.id} style={{ display: "flex", gap: "12px", fontSize: "0.82rem" }}>
                 <div style={{ width: "48px", fontWeight: 700, color: "#2f6ea8", flexShrink: 0 }}>
                   {evt.time}
