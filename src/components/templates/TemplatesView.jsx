@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useIncidentContext } from "../../context/IncidentContext";
+import { useIncidentContext } from "../../context/useIncidentContext";
 import { STORES_CATALOG } from "../../data/storesData";
 import { FileCode, ArrowRight, Zap, Copy, Check } from "lucide-react";
 
@@ -8,11 +8,26 @@ export const TemplatesView = () => {
 
   // Estado do Módulo de Loja Isolada (Energia & Link)
   const [selectedVd, setSelectedVd] = useState("VD 003");
+  const [storeQuery, setStoreQuery] = useState("");
   const [horaInicio, setHoraInicio] = useState("14:30");
   const [horaPrevisao, setHoraPrevisao] = useState("17:00");
   const [copiedKey, setCopiedKey] = useState(null);
 
   const selectedStoreObj = STORES_CATALOG.find(s => s.vd === selectedVd) || STORES_CATALOG[0];
+
+  // O catálogo tem 1.670 lojas — um <select> nativo com todas as opções de uma vez
+  // é ruim de navegar e pesado de renderizar. Filtra por VD/nome/região e limita a
+  // 100 resultados por vez, garantindo que qualquer uma das 1.670 lojas seja
+  // alcançável (não só as primeiras da lista).
+  const q = storeQuery.trim().toLowerCase();
+  const filteredStoreOptions = (q
+    ? STORES_CATALOG.filter(s =>
+        (s.vd || "").toLowerCase().includes(q) ||
+        (s.nomeLoja || "").toLowerCase().includes(q) ||
+        (s.regiao || "").toLowerCase().includes(q)
+      )
+    : STORES_CATALOG
+  ).slice(0, 100);
 
   const handleUseTemplate = (tpl) => {
     setActiveCardDraft({
@@ -69,11 +84,38 @@ export const TemplatesView = () => {
 👤 *GGL:* ${selectedStoreObj.ggl}`;
   };
 
-  const handleCopyText = (text, keyName) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(keyName);
-    if (showToast) showToast("Texto de informativo copiado para o WhatsApp!");
-    setTimeout(() => setCopiedKey(null), 2000);
+  const handleCopyText = async (text, keyName) => {
+    let success = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        success = true;
+      }
+    } catch {
+      // Fallback para contextos onde a Clipboard API é bloqueada
+    }
+
+    if (!success) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        success = document.execCommand("copy");
+        document.body.removeChild(textArea);
+      } catch (err) {
+        console.error("Erro ao copiar texto:", err);
+      }
+    }
+
+    if (success) {
+      setCopiedKey(keyName);
+      setTimeout(() => setCopiedKey(null), 2000);
+    }
+    if (showToast) showToast(success ? "Texto de informativo copiado para o WhatsApp!" : "Não foi possível copiar automaticamente.", success ? "success" : "error");
   };
 
   const isoladaBlocks = [
@@ -111,13 +153,26 @@ export const TemplatesView = () => {
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "14px" }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label className="form-label" style={{ fontSize: "0.78rem" }}>Selecionar Loja / VD:</label>
+            <input
+              type="text"
+              className="form-input"
+              style={{ marginBottom: "6px" }}
+              placeholder="Filtrar entre as 1.670 lojas por VD, nome ou região..."
+              value={storeQuery}
+              onChange={(e) => setStoreQuery(e.target.value)}
+            />
             <select className="form-select" value={selectedVd} onChange={(e) => setSelectedVd(e.target.value)}>
-              {STORES_CATALOG.slice(0, 50).map(s => (
+              {filteredStoreOptions.map(s => (
                 <option key={s.vd} value={s.vd}>
                   {s.vd} - {s.nomeLoja} ({s.regiao})
                 </option>
               ))}
             </select>
+            {filteredStoreOptions.length === 100 && (
+              <span style={{ fontSize: "0.68rem", color: "var(--text-dim)", marginTop: "4px", display: "block" }}>
+                Mostrando 100 de {STORES_CATALOG.length} lojas — refine a busca para ver outras.
+              </span>
+            )}
           </div>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label className="form-label" style={{ fontSize: "0.78rem" }}>Horário Início:</label>
@@ -140,7 +195,7 @@ export const TemplatesView = () => {
                   <span>{copiedKey === block.key ? "Copiado!" : "Copiar"}</span>
                 </button>
               </div>
-              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)", fontSize: "0.78rem", color: "var(--text-muted)", backgroundColor: "rgba(0,0,0,0.25)", padding: "10px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontFamily: "'SF Mono', 'Consolas', monospace", fontSize: "0.78rem", color: "var(--text-muted)", backgroundColor: "rgba(0,0,0,0.25)", padding: "10px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
                 {block.text}
               </pre>
             </div>
