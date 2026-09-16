@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { INITIAL_INCIDENTS, SYSTEM_CATALOG, PHRASE_LIBRARY, CARD_TEMPLATES, TEAMS_LIST } from "../data/mockData";
-import { StoreLookupModal } from "../components/stores/StoreLookupModal";
 import { NormalizeIncidentModal } from "../components/incidents/NormalizeIncidentModal";
 import { IncidentContext } from "./incidentContextInstance";
+
+// Carregado sob demanda: o catálogo oficial de lojas (storesData.js) tem ~640KB com
+// as 1.670 lojas ativas, e ficava embutido no bundle principal (carregado em toda
+// visita, mesmo sem abrir o modal) porque StoreLookupModal era importado direto aqui,
+// que é montado globalmente. Com lazy(), esse peso só é buscado quando o modal abre.
+const StoreLookupModal = lazy(() => import("../components/stores/StoreLookupModal").then(m => ({ default: m.StoreLookupModal })));
 
 // Date.now() sozinho colide quando duas entradas (ex: evento de timeline + log de
 // auditoria) são criadas na mesma sequência síncrona, dentro do mesmo milissegundo —
@@ -396,14 +401,19 @@ export const IncidentProvider = ({ children }) => {
         onConfirm={handleConfirmNormalize}
       />
 
-      {/* Modal Corporativo de Consulta de Lojas e VDs */}
-      <StoreLookupModal
-        isOpen={isStoreModalOpen} 
-        onClose={() => setIsStoreModalOpen(false)} 
-        onSelectStore={(store) => {
-          showToast(`Loja ${store.vd} (${store.nomeLoja}) selecionada!`);
-        }}
-      />
+      {/* Modal Corporativo de Consulta de Lojas e VDs — só monta (e baixa o chunk
+          lazy com as 1.670 lojas) quando o operador realmente abre o modal. */}
+      {isStoreModalOpen && (
+        <Suspense fallback={null}>
+          <StoreLookupModal
+            isOpen={isStoreModalOpen}
+            onClose={() => setIsStoreModalOpen(false)}
+            onSelectStore={(store) => {
+              showToast(`Loja ${store.vd} (${store.nomeLoja}) selecionada!`);
+            }}
+          />
+        </Suspense>
+      )}
 
       {/* Toast Notification Banner Organic UI */}
       {toastMessage && (

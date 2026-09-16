@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { STORES_CATALOG } from "../../data/storesData";
-import { Search, Store, User, MapPin, X, Plus } from "lucide-react";
+import { Search, Store, User, Mail, X, Plus } from "lucide-react";
+
+// Campo pode não existir dependendo da fonte de dados importada (ex: a base oficial
+// de 1.670 lojas não tem "estado"/"endereco" como a base mock antiga tinha) — usar um
+// acesso seguro evita que a busca quebre a aplicação inteira por um campo ausente.
+const norm = (value) => (value || "").toString().toLowerCase();
 
 export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
   const [query, setQuery] = useState("");
@@ -8,17 +13,15 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
 
   if (!isOpen) return null;
 
-  const filteredStores = STORES_CATALOG.filter(st => {
-    const q = query.toLowerCase();
-    return (
-      st.vd.toLowerCase().includes(q) ||
-      st.nomeLoja.toLowerCase().includes(q) ||
-      st.ggl.toLowerCase().includes(q) ||
-      st.gr.toLowerCase().includes(q) ||
-      st.regiao.toLowerCase().includes(q) ||
-      st.estado.toLowerCase().includes(q)
-    );
-  });
+  const q = norm(query);
+  const filteredStores = STORES_CATALOG.filter(st => (
+    norm(st.vd).includes(q) ||
+    norm(st.codigo).includes(q) ||
+    norm(st.nomeLoja).includes(q) ||
+    norm(st.ggl).includes(q) ||
+    norm(st.gr).includes(q) ||
+    norm(st.regiao).includes(q)
+  ));
 
   const handleConfirmSelect = (store) => {
     if (onSelectStore) {
@@ -133,18 +136,20 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
                 </h4>
 
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", fontSize: "0.75rem", color: "rgba(245,234,216,0.7)" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <MapPin size={12} color="#f2a39c" />
-                    {st.endereco}
-                  </span>
-                  <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "4px" }} title={st.gglEmail || undefined}>
                     <User size={12} color="#f59e0b" />
-                    <strong>GGL:</strong> {st.ggl} ({st.gglPhone})
+                    <strong>GGL:</strong> {st.ggl}{st.gglPhone && st.gglPhone !== "-" ? ` (${st.gglPhone})` : ""}
                   </span>
-                  <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: "4px" }} title={st.grEmail || undefined}>
                     <User size={12} color="#387fef" />
-                    <strong>GR:</strong> {st.gr} ({st.grPhone})
+                    <strong>GR:</strong> {st.gr}{st.grPhone && st.grPhone !== "-" ? ` (${st.grPhone})` : ""}
                   </span>
+                  {st.gglEmail && (
+                    <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "rgba(245,234,216,0.5)" }}>
+                      <Mail size={12} />
+                      {st.gglEmail}
+                    </span>
+                  )}
                 </div>
               </div>
 
