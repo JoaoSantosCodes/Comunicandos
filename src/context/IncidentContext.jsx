@@ -243,12 +243,27 @@ export const IncidentProvider = ({ children }) => {
     else if (textLower.includes("link")) service = "Link Corporativo Loja";
     else if (textLower.includes("tef")) service = "Autorizador TEF Sitef";
 
+    // Abrangência por região, distinguindo Loja (varejo) de CD (distribuição) pelo contexto do texto.
+    // Usa \b (limite de palavra) para "sp"/"mg"/"rj"/"go" não casarem como substring de outras palavras.
+    const isLojaContext = textLower.includes("loja") || textLower.includes("filiais") || textLower.includes("pdv");
+    const mentionsSP = /\bsp\b/.test(textLower) || textLower.includes("sao paulo") || textLower.includes("cdsp");
+    const mentionsMG = /\bmg\b/.test(textLower) || textLower.includes("minas") || textLower.includes("cdmg");
+    const mentionsRJ = /\brj\b/.test(textLower) || /\brio\b/.test(textLower) || textLower.includes("cdrj") || textLower.includes("niteroi");
+    const mentionsGO = /\bgo\b/.test(textLower) || textLower.includes("goias") || textLower.includes("cdgo");
+
     const scope = [];
-    if (textLower.includes("cdsp") || textLower.includes("sao paulo") || textLower.includes("sp")) scope.push("CDSP - São Paulo");
-    if (textLower.includes("cdmg") || textLower.includes("minas")) scope.push("CDMG - Minas Gerais");
-    if (textLower.includes("cdrj") || textLower.includes("rio")) scope.push("CDRJ - Rio de Janeiro");
+    if (isLojaContext) {
+      if (mentionsSP) scope.push("Lojas SP");
+      if (mentionsRJ) scope.push("Lojas RJ");
+      if (mentionsMG) scope.push("Lojas MG");
+      if (mentionsGO) scope.push("Lojas GO");
+    } else {
+      if (mentionsSP) scope.push("CDSP - São Paulo");
+      if (mentionsMG) scope.push("CDMG - Minas Gerais");
+      if (mentionsRJ) scope.push("CDRJ - Rio de Janeiro");
+      if (mentionsGO) scope.push("CDGO - Goiás");
+    }
     if (textLower.includes("matriz")) scope.push("Matriz Corporativa");
-    if (textLower.includes("loja") || textLower.includes("filiais")) scope.push("Lojas (Regional SP/RJ)");
     if (scope.length === 0) scope.push("CDSP - São Paulo");
 
     let responsible = "Wipro Tech Support";
@@ -257,8 +272,8 @@ export const IncidentProvider = ({ children }) => {
     else if (textLower.includes("sitef")) responsible = "TI Varejo & Sitef";
 
     let severity = "alta";
-    if (textLower.includes("critico") || textLower.includes("parou") || textLower.includes("caiu")) severity = "critica";
-    else if (textLower.includes("oscilacao") || textLower.includes("lentidao")) severity = "media";
+    if (textLower.includes("critico") || textLower.includes("parou") || textLower.includes("caiu") || textLower.includes("indispon")) severity = "critica";
+    else if (textLower.includes("oscilacao") || textLower.includes("lentidao") || textLower.includes("instabilidade") || textLower.includes("instavel")) severity = "media";
 
     return {
       title: textNote.slice(0, 65) + (textNote.length > 65 ? "..." : ""),
