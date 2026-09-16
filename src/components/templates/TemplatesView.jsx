@@ -7,7 +7,9 @@ export const TemplatesView = () => {
   const { templates, setActiveTab, setActiveCardDraft, showToast } = useIncidentContext();
 
   // Estado do Módulo de Loja Isolada (Energia & Link)
-  const [selectedVd, setSelectedVd] = useState("VD 003");
+  // OBS: a partir do reimport de 16/09/2026, "vd" é o código bruto (ex: "3"), sem o
+  // prefixo "VD " nem zero-padding — alinhado ao schema StoreCard do backend Java.
+  const [selectedVd, setSelectedVd] = useState(STORES_CATALOG[0]?.vd || "");
   const [storeQuery, setStoreQuery] = useState("");
   const [horaInicio, setHoraInicio] = useState("14:30");
   const [horaPrevisao, setHoraPrevisao] = useState("17:00");
@@ -27,7 +29,7 @@ export const TemplatesView = () => {
   const filteredStoreOptions = (q
     ? STORES_CATALOG.filter(s =>
         (s.vd || "").toLowerCase().includes(q) ||
-        (s.nomeLoja || "").toLowerCase().includes(q) ||
+        (s.nome || "").toLowerCase().includes(q) ||
         (s.regiao || "").toLowerCase().includes(q)
       )
     : STORES_CATALOG
@@ -52,7 +54,7 @@ export const TemplatesView = () => {
   // Geradores de Textos Formatados de Loja Isolada (Regra de Negócios do Documento)
   const getEnergiaAberturaText = () => {
     return `⚡ *ATENÇÃO - INFORMAÇÃO DE LOJA ISOLADA (ENERGIA)*
-📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+📍 *Loja:* VD ${selectedStoreObj.vd} - ${selectedStoreObj.nome} (${selectedStoreObj.regiao})
 🕒 *Início:* ${horaInicio}h | *Previsão de Retorno:* ${horaPrevisao}h
 ⚠️ *Motivo:* Queda no fornecimento de energia elétrica na região.
 👤 *GGL:* ${selectedStoreObj.ggl} (${selectedStoreObj.gglPhone})
@@ -63,7 +65,7 @@ export const TemplatesView = () => {
 
   const getEnergiaFechamentoText = () => {
     return `🟢 *NORMALIZAÇÃO - ENERGIA ELÉTRICA RESTABELECIDA*
-📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+📍 *Loja:* VD ${selectedStoreObj.vd} - ${selectedStoreObj.nome} (${selectedStoreObj.regiao})
 🕒 *Horário da Normalização:* ${horaPrevisao}h
 ✅ *Status:* Energia restabelecida. Caixas PDV e sistemas operacionais totalmente liberados.
 👤 *GGL:* ${selectedStoreObj.ggl}`;
@@ -71,7 +73,7 @@ export const TemplatesView = () => {
 
   const getLinkAberturaText = () => {
     return `🌐 *ATENÇÃO - INFORMAÇÃO DE LOJA ISOLADA (LINK INTERNET)*
-📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+📍 *Loja:* VD ${selectedStoreObj.vd} - ${selectedStoreObj.nome} (${selectedStoreObj.regiao})
 🕒 *Início:* ${horaInicio}h | *Previsão de Solução:* ${horaPrevisao}h
 ⚠️ *Motivo:* Queda nos circuitos principal e backup de comunicação (Telecom/Fibra).
 👤 *GGL:* ${selectedStoreObj.ggl} (${selectedStoreObj.gglPhone})
@@ -82,7 +84,7 @@ export const TemplatesView = () => {
 
   const getLinkFechamentoText = () => {
     return `🟢 *NORMALIZAÇÃO - LINK DE COMUNICAÇÃO RESTABELECIDO*
-📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+📍 *Loja:* VD ${selectedStoreObj.vd} - ${selectedStoreObj.nome} (${selectedStoreObj.regiao})
 🕒 *Horário da Normalização:* ${horaPrevisao}h
 ✅ *Status:* Circuitos de internet operacionais. Conectividade com a matriz e TEF reestabelecida.
 👤 *GGL:* ${selectedStoreObj.ggl}`;
@@ -93,7 +95,7 @@ export const TemplatesView = () => {
   // de chamado junto à operadora, já com contatos de GGL/GR preenchidos.
   const getChamadoVivoText = () => {
     return `📋 *ABERTURA DE CHAMADO — OPERADORA VIVO*
-📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+📍 *Loja:* VD ${selectedStoreObj.vd} - ${selectedStoreObj.nome} (${selectedStoreObj.regiao})
 👤 *Solicitante:* ${solicitanteNome || "Central de Comando DPSP"}
 ⚠️ *Motivo:* ${chamadoMotivo}
 👤 *GGL:* ${selectedStoreObj.ggl}${selectedStoreObj.gglPhone && selectedStoreObj.gglPhone !== "-" ? ` (${selectedStoreObj.gglPhone})` : ""}
@@ -104,7 +106,7 @@ export const TemplatesView = () => {
 
   const getChamadoClaroText = () => {
     return `📋 *ABERTURA DE CHAMADO — OPERADORA CLARO*
-📍 *Loja:* ${selectedStoreObj.vd} - ${selectedStoreObj.nomeLoja} (${selectedStoreObj.regiao})
+📍 *Loja:* VD ${selectedStoreObj.vd} - ${selectedStoreObj.nome} (${selectedStoreObj.regiao})
 👤 *Solicitante:* ${solicitanteNome || "Central de Comando DPSP"}
 ⚠️ *Motivo:* ${chamadoMotivo}
 👤 *GGL:* ${selectedStoreObj.ggl}${selectedStoreObj.gglPhone && selectedStoreObj.gglPhone !== "-" ? ` (${selectedStoreObj.gglPhone})` : ""}
@@ -198,7 +200,7 @@ export const TemplatesView = () => {
             <select className="form-select" value={selectedVd} onChange={(e) => setSelectedVd(e.target.value)}>
               {filteredStoreOptions.map(s => (
                 <option key={s.vd} value={s.vd}>
-                  {s.vd} - {s.nomeLoja} ({s.regiao})
+                  VD {s.vd} - {s.nome} ({s.regiao})
                 </option>
               ))}
             </select>

@@ -409,7 +409,7 @@ export const IncidentProvider = ({ children }) => {
             isOpen={isStoreModalOpen}
             onClose={() => setIsStoreModalOpen(false)}
             onSelectStore={(store) => {
-              showToast(`Loja ${store.vd} (${store.nomeLoja}) selecionada!`);
+              showToast(`Loja VD ${store.vd} (${store.nome}) selecionada!`);
             }}
           />
         </Suspense>
