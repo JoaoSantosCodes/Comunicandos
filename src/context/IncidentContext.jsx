@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { INITIAL_INCIDENTS, SYSTEM_CATALOG, PHRASE_LIBRARY, CARD_TEMPLATES, TEAMS_LIST } from "../data/mockData";
+import { StoreLookupModal } from "../components/stores/StoreLookupModal";
 
 const IncidentContext = createContext(null);
 
@@ -113,15 +114,20 @@ export const IncidentProvider = ({ children }) => {
     return incidents.find(i => i.id === selectedIncidentId) || incidents[0];
   };
 
+  const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
+
   const createIncident = (incidentData) => {
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const randomSeq = String(incidents.length + 1).padStart(3, "0");
     const newId = `INC-${dateStr}-${randomSeq}`;
+    const acnCode = incidentData.acn || `ACN-${Math.floor(1000 + Math.random() * 9000)}`;
     
     const nowTime = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
     const newIncident = {
       id: newId,
+      acn: acnCode,
+      analistaResponsavel: incidentData.analistaResponsavel || "João Carlos (Operador NOC)",
       ...incidentData,
       status: incidentData.status || "investigacao",
       startAt: incidentData.startAt || new Date().toISOString(),
@@ -133,15 +139,15 @@ export const IncidentProvider = ({ children }) => {
           type: "criacao",
           title: "Incidente Registrado na Central de Comando",
           description: incidentData.description || "Registro inicial do evento.",
-          author: "Operador NOC"
+          author: incidentData.analistaResponsavel || "Operador NOC"
         }
       ],
       communications: []
     };
 
     setIncidents(prev => [newIncident, ...prev]);
-    addAuditLog("Criação de Incidente", newId, `Criado incidente ${incidentData.system} - ${incidentData.title}`);
-    showToast(`Incidente ${newId} criado com sucesso!`);
+    addAuditLog("Criação de Incidente", newId, `Criado incidente ${incidentData.system} - ${incidentData.title} (ACN: ${acnCode})`);
+    showToast(`Incidente ${newId} (ACN: ${acnCode}) criado com sucesso!`);
     setSelectedIncidentId(newId);
     setActiveTab("incident-detail", newId);
     return newId;
@@ -173,10 +179,18 @@ export const IncidentProvider = ({ children }) => {
     showToast("Evento registrado na timeline!");
   };
 
-  const updateIncidentStatus = (incidentId, newStatus, newSeverity) => {
+  const updateIncidentStatus = (incidentId, newStatus, newSeverity, extraData = {}) => {
     setIncidents(prev => prev.map(inc => {
       if (inc.id === incidentId) {
-        const updated = { ...inc, status: newStatus, updatedAt: new Date().toISOString() };
+        const updated = { 
+          ...inc, 
+          status: newStatus, 
+          updatedAt: new Date().toISOString(),
+          ...extraData
+        };
+        if (newStatus === "normalizado") {
+          updated.dataEncerramento = new Date().toISOString();
+        }
         if (newSeverity) updated.severity = newSeverity;
         return updated;
       }
@@ -189,15 +203,26 @@ export const IncidentProvider = ({ children }) => {
       normalizado: "🟢 Normalizado"
     };
 
+    const desc = extraData.solucaoAplicada 
+      ? `Normalização confirmada. Solução: ${extraData.solucaoAplicada}` 
+      : "Atualização de status operacional realizada pelo operador.";
+
     addTimelineEvent(incidentId, {
       type: newStatus === "normalizado" ? "normalizacao" : "atualizacao",
       title: `Status alterado para: ${statusMap[newStatus] || newStatus}`,
-      description: `Atualização de status operacional realizada pelo operador.`,
+      description: desc,
       author: "Central de Comando"
     });
 
     addAuditLog("Mudança de Status", incidentId, `Status alterado para ${newStatus}`);
     showToast(`Status do incidente alterado para ${newStatus}`);
+  };
+
+  const encerrarIncidente = (incidentId, solucaoAplicada, causaRaizResolvida) => {
+    updateIncidentStatus(incidentId, "normalizado", null, {
+      solucaoAplicada,
+      causaRaizResolvida
+    });
   };
 
   const createCommunicationCard = (commData) => {
@@ -331,10 +356,23 @@ export const IncidentProvider = ({ children }) => {
         createCommunicationCard,
         parseNotesWithAi,
         addPhrase,
-        addAuditLog
+        addAuditLog,
+        isStoreModalOpen,
+        setIsStoreModalOpen,
+        encerrarIncidente
       }}
     >
       {children}
+
+      {/* Modal Corporativo de Consulta de Lojas e VDs */}
+      <StoreLookupModal 
+        isOpen={isStoreModalOpen} 
+        onClose={() => setIsStoreModalOpen(false)} 
+        onSelectStore={(store) => {
+          showToast(`Loja ${store.vd} (${store.nomeLoja}) selecionada!`);
+        }}
+      />
+
       {/* Toast Notification Banner Organic UI */}
       {toastMessage && (
         <div 

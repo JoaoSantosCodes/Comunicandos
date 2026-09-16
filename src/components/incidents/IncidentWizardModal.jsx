@@ -6,7 +6,7 @@ export const IncidentWizardModal = () => {
   const { createIncident, setActiveTab } = useIncidentContext();
 
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     system: "SAP",
     service: "Integração de Pedidos",
     title: "",
@@ -14,8 +14,10 @@ export const IncidentWizardModal = () => {
     description: "",
     scope: ["CDSP", "CDMG"],
     teams: ["Equipe SAP", "Wipro"],
-    responsible: "Wipro Tech Support"
-  });
+    responsible: "Wipro Tech Support",
+    acn: `ACN-${Math.floor(1000 + Math.random() * 9000)}`,
+    analistaResponsavel: "João Carlos (Operador NOC)"
+  }));
 
   const availableScopes = ["CDSP", "CDMG", "CDRJ", "CDGO", "Matriz", "Lojas SP", "Lojas RJ", "Lojas MG"];
   const availableTeams = ["Equipe SAP", "Wipro", "Equipe Redes", "Telecom", "TI Varejo", "Central de Comando"];
@@ -98,6 +100,29 @@ export const IncidentWizardModal = () => {
                   <option value="Cloud / AWS">Cloud AWS & Banco de Dados</option>
                   <option value="Outros">Outros Sistemas Operacionais</option>
                 </select>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div className="form-group">
+                  <label className="form-label">Código ACN (Atuação de Crise NOC)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: ACN-9982"
+                    value={formData.acn}
+                    onChange={(e) => setFormData({ ...formData, acn: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Analista Responsável NOC</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: João Carlos (Operador NOC)"
+                    value={formData.analistaResponsavel}
+                    onChange={(e) => setFormData({ ...formData, analistaResponsavel: e.target.value })}
+                  />
+                </div>
               </div>
 
               <div className="form-group">

@@ -105,6 +105,11 @@ export const IncidentDetailView = () => {
               <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "1rem", color: "#2f6ea8" }}>
                 {incident.id}
               </span>
+              {incident.acn && (
+                <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "0.8rem", backgroundColor: "rgba(200, 55, 45, 0.15)", color: "var(--accent-red)", padding: "2px 8px", borderRadius: "6px" }}>
+                  {incident.acn}
+                </span>
+              )}
               <span className={`status-badge ${incident.severity}`}>
                 {incident.severity.toUpperCase()}
               </span>
@@ -120,11 +125,33 @@ export const IncidentDetailView = () => {
             </p>
           </div>
 
-          <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px 18px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
-            <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Responsável Principal</div>
-            <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.responsible}</div>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px 18px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
+              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Analista NOC</div>
+              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.analistaResponsavel || "Operador NOC"}</div>
+            </div>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px 18px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
+              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Responsável Técnico</div>
+              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.responsible}</div>
+            </div>
           </div>
         </div>
+
+        {/* RCA & Solução se Normalizado */}
+        {incident.status === "normalizado" && (incident.solucaoAplicada || incident.causaRaizResolvida) && (
+          <div style={{ marginTop: "14px", padding: "12px", backgroundColor: "rgba(16, 185, 129, 0.08)", border: "1px solid rgba(16, 185, 129, 0.2)", borderRadius: "10px", fontSize: "0.82rem" }}>
+            {incident.solucaoAplicada && (
+              <div style={{ color: "#0f7a56", marginBottom: "4px" }}>
+                <strong>🟢 Solução Aplicada:</strong> {incident.solucaoAplicada}
+              </div>
+            )}
+            {incident.causaRaizResolvida && (
+              <div style={{ color: "var(--text-muted)" }}>
+                <strong>🔍 Causa Raiz (RCA):</strong> {incident.causaRaizResolvida}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Scope Chips */}
         <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: "10px", fontSize: "0.8rem" }}>

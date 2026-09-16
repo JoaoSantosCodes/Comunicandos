@@ -1,9 +1,9 @@
 import React from "react";
 import { useIncidentContext } from "../../context/IncidentContext";
-import { Search, Bell, Plus, ShieldAlert, Sparkles, Menu } from "lucide-react";
+import { Search, Bell, Plus, ShieldAlert, Sparkles, Menu, Store } from "lucide-react";
 
 export const Header = ({ onToggleMobileMenu = () => {} }) => {
-  const { searchQuery, setSearchQuery, setActiveTab, incidents } = useIncidentContext();
+  const { searchQuery, setSearchQuery, setActiveTab, incidents, setIsStoreModalOpen } = useIncidentContext();
   
   const activeCritical = incidents.filter(i => i.severity === "critica" && i.status !== "normalizado");
 
@@ -63,6 +63,17 @@ export const Header = ({ onToggleMobileMenu = () => {} }) => {
             <span>SALA DE CRISE ({activeCritical.length})</span>
           </button>
         )}
+
+        {/* Lojas & VDs Lookup Button */}
+        <button
+          onClick={() => setIsStoreModalOpen(true)}
+          className="btn btn-secondary btn-sm"
+          style={{ display: "flex", alignItems: "center", gap: "6px" }}
+          title="Consultar VDs, Lojas, GGL e GR"
+        >
+          <Store size={14} style={{ color: "var(--accent-red)" }} />
+          <span>Lojas / VDs</span>
+        </button>
 
         {/* AI Parser Quick Trigger */}
         <button

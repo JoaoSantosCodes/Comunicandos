@@ -156,13 +156,16 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
   const BadgeIconComponent = styleConfig.Icon;
   const activeHeaderTag = headerTag || styleConfig.defaultTag;
 
-  // Render formatted text for **bold**
+  // Render formatted text for *bold* (Single or Double asterisks - matching Java ImageGenerationService)
   const renderFormattedText = (text) => {
     if (!text) return null;
-    const parts = String(text).split(/(\*\*.*?\*\*)/g);
+    const parts = String(text).split(/(\*\*.*?\*\*|\*.*?\*)/g);
     return parts.map((part, i) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
+      if ((part.startsWith("**") && part.endsWith("**")) && part.length > 4) {
         return <strong key={i} style={{ fontWeight: 800, color: "#0f172a" }}>{part.slice(2, -2)}</strong>;
+      }
+      if ((part.startsWith("*") && part.endsWith("*")) && part.length > 2) {
+        return <strong key={i} style={{ fontWeight: 800, color: "#0f172a" }}>{part.slice(1, -1)}</strong>;
       }
       return part;
     });
