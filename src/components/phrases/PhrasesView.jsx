@@ -1,0 +1,44 @@
+import React from "react";
+import { useIncidentContext } from "../../context/IncidentContext";
+import { MessageSquare, Plus } from "lucide-react";
+
+export const PhrasesView = () => {
+  const { phrases } = useIncidentContext();
+
+  return (
+    <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.4rem", fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: "10px" }}>
+            <MessageSquare style={{ color: "#3b82f6" }} />
+            BIBLIOTECA DE FRASES PADRONIZADAS
+          </h2>
+          <p style={{ color: "#9ca3af", fontSize: "0.85rem" }}>
+            Textos institucionais pré-aprovados para velocidade e padronização.
+          </p>
+        </div>
+        <button className="btn btn-primary">
+          <Plus size={16} />
+          <span>Nova Frase</span>
+        </button>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
+        {phrases.map((cat, idx) => (
+          <div key={idx} className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#60a5fa", borderBottom: "1px solid var(--border-color)", paddingBottom: "8px" }}>
+              {cat.category}
+            </h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {cat.phrases.map((phrase, pIdx) => (
+                <div key={pIdx} style={{ backgroundColor: "#0b101d", padding: "12px", borderRadius: "6px", border: "1px solid var(--border-color)", fontSize: "0.85rem", color: "#e5e7eb" }}>
+                  "{phrase}"
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
