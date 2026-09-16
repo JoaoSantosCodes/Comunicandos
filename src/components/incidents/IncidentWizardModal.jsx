@@ -278,9 +278,43 @@ export const IncidentWizardModal = () => {
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Ex: Wipro / Equipe Basis SAP"
+                  placeholder="Ex: Wipro / Equipe Basis SAP / Vivo Empresas"
                   value={formData.responsible}
                   onChange={(e) => setFormData({ ...formData, responsible: e.target.value })}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div className="form-group">
+                  <label className="form-label">Nº do Chamado ServiceNow (SNOW)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: INC0098412"
+                    value={formData.ticketServiceNow || ""}
+                    onChange={(e) => setFormData({ ...formData, ticketServiceNow: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Horário Próximo Status (Follow-up)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: 16:30h"
+                    value={formData.proximoStatus || ""}
+                    onChange={(e) => setFormData({ ...formData, proximoStatus: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Link da Sala de Crise (Microsoft Teams / Meet)</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Ex: https://teams.microsoft.com/l/meetup-join/..."
+                  value={formData.linkSalaCrise || ""}
+                  onChange={(e) => setFormData({ ...formData, linkSalaCrise: e.target.value })}
                 />
               </div>
 

@@ -1,6 +1,13 @@
 export const INITIAL_INCIDENTS = [
   {
     id: "INC-20260915-001",
+    acn: "ACN-8841",
+    ticketServiceNow: "INC0098412",
+    proximoStatus: "16:30",
+    linkSalaCrise: "https://teams.microsoft.com/l/meetup-join/dpsp-crise-p1",
+    fornecedoresAcionados: ["Equipe Basis SAP", "Wipro Tech Support"],
+    canaisAfetados: ["PDV Loja Física", "iFood / Rappi", "E-commerce DPSP"],
+    slaEta: "17:30",
     title: "Instabilidade na Integração PeopleSoft / EWM",
     system: "SAP",
     service: "Integração de Pedidos",
@@ -75,6 +82,13 @@ export const INITIAL_INCIDENTS = [
   },
   {
     id: "INC-20260915-002",
+    acn: "ACN-4920",
+    ticketServiceNow: "INC0098418",
+    proximoStatus: "16:00",
+    linkSalaCrise: "https://teams.microsoft.com/l/meetup-join/dpsp-telecom",
+    fornecedoresAcionados: ["Vivo Empresas", "Algar Telecom"],
+    canaisAfetados: ["PDV Loja Física", "PBM Convênios"],
+    slaEta: "17:00",
     title: "Lentidão e oscilação no Link de Dados de Lojas",
     system: "Rede / Telecom",
     service: "Link Corporativo Loja",

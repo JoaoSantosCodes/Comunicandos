@@ -101,13 +101,23 @@ export const IncidentDetailView = () => {
       <div className="panel-card" style={{ borderLeft: `6px solid ${incident.status === 'normalizado' ? '#10b981' : incident.severity === 'critica' ? '#ef4444' : '#f59e0b'}` }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px", marginBottom: "8px" }}>
               <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "1rem", color: "#2f6ea8" }}>
                 {incident.id}
               </span>
+              {incident.ticketServiceNow && (
+                <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "0.8rem", backgroundColor: "rgba(59, 130, 246, 0.15)", color: "#3b82f6", padding: "2px 8px", borderRadius: "6px", border: "1px solid rgba(59, 130, 246, 0.3)" }}>
+                  SNOW: {incident.ticketServiceNow}
+                </span>
+              )}
               {incident.acn && (
                 <span style={{ fontFamily: "monospace", fontWeight: 800, fontSize: "0.8rem", backgroundColor: "rgba(200, 55, 45, 0.15)", color: "var(--accent-red)", padding: "2px 8px", borderRadius: "6px" }}>
                   {incident.acn}
+                </span>
+              )}
+              {incident.proximoStatus && (
+                <span style={{ fontSize: "0.78rem", fontWeight: 700, backgroundColor: "rgba(245, 158, 11, 0.15)", color: "#f59e0b", padding: "2px 8px", borderRadius: "6px", border: "1px solid rgba(245, 158, 11, 0.3)" }}>
+                  ⏰ Próximo Status: {incident.proximoStatus}
                 </span>
               )}
               <span className={`status-badge ${incident.severity}`}>
@@ -125,14 +135,25 @@ export const IncidentDetailView = () => {
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: "12px" }}>
-            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px 18px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+            {incident.linkSalaCrise && (
+              <a
+                href={incident.linkSalaCrise}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-sm"
+                style={{ backgroundColor: "#4f46e5", color: "#fff", border: "none", fontWeight: 700, padding: "10px 14px" }}
+              >
+                🎥 Entrar na Sala de Crise (Teams)
+              </a>
+            )}
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "10px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
               <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Analista NOC</div>
-              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.analistaResponsavel || "Operador NOC"}</div>
+              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.analistaResponsavel || "Operador NOC"}</div>
             </div>
-            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px 18px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "10px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", textAlign: "right" }}>
               <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Responsável Técnico</div>
-              <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.responsible}</div>
+              <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-main)", marginTop: "2px" }}>{incident.responsible}</div>
             </div>
           </div>
         </div>

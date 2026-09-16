@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { STORES_DATA } from "../../data/storesData";
-import { Search, Store, X, Copy, Check, Building2 } from "lucide-react";
+import { 
+  Search, Store, User, Mail, X, Plus, Copy, Check, Phone, MapPin, 
+  Clock, ShieldAlert, Cpu, ExternalLink, Filter, Building2, CheckCircle2,
+  ShoppingBag, Syringe, Pill, Truck, Radio, Layers
+} from "lucide-react";
 
 const norm = (value) => (value || "").toString().toLowerCase().trim();
 
@@ -10,8 +14,9 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
   const [filterMode, setFilterMode] = useState("vd_desig");
   const [selectedVd, setSelectedVd] = useState("490");
   const [copiedField, setCopiedField] = useState(null);
+  const [techInfo, setTechInfo] = useState("");
 
-  // Search logic supporting VD, Nome, Designação, GGL, GR, Cidade
+  // Search logic supporting VD, Nome, Designação, GGL, GR, Cidade, Divisão
   const filteredStores = useMemo(() => {
     const q = norm(query);
     if (!q) return STORES_DATA.slice(0, 50);
@@ -19,16 +24,18 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
     return STORES_DATA.filter((st) => {
       const matchVd = norm(st.vd).includes(q);
       const matchNome = norm(st.nome).includes(q);
-      const matchGgl = norm(st.ggl).includes(q);
-      const matchGr = norm(st.gr).includes(q);
+      const matchGgl = norm(st.ggl).includes(q) || norm(st.emailGgl).includes(q);
+      const matchGr = norm(st.gr).includes(q) || norm(st.emailGr).includes(q);
+      const matchDiv = norm(st.nomeDiv).includes(q);
       const matchCidade = norm(st.cidade).includes(q);
       const matchEndereco = norm(st.endereco).includes(q);
+      const matchCd = norm(st.cdSupridor).includes(q);
       
       const matchDesignacao = st.designacoes && st.designacoes.some(d => 
         norm(d.numero).includes(q) || norm(d.operadora).includes(q) || norm(d.tipo).includes(q)
       );
 
-      return matchVd || matchNome || matchGgl || matchGr || matchCidade || matchEndereco || matchDesignacao;
+      return matchVd || matchNome || matchGgl || matchGr || matchDiv || matchCidade || matchEndereco || matchCd || matchDesignacao;
     }).slice(0, 100);
   }, [query]);
 
@@ -39,39 +46,11 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
 
   if (!isOpen) return null;
 
-  const handleCopy = async (text, fieldName) => {
-    if (!text) return;
-    let success = false;
-
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-        success = true;
-      }
-    } catch {
-      // Fallback para contextos onde a Clipboard API é bloqueada
-    }
-
-    if (!success) {
-      try {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        success = document.execCommand("copy");
-        document.body.removeChild(textArea);
-      } catch (err) {
-        console.error("Erro ao copiar texto:", err);
-      }
-    }
-
-    if (success) {
-      setCopiedField(fieldName);
-      setTimeout(() => setCopiedField(null), 2000);
-    }
+  const handleCopy = (text, fieldName) => {
+    if (!text || text === "N/A") return;
+    navigator.clipboard.writeText(text);
+    setCopiedField(fieldName);
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   const handleConfirmSelect = (store) => {
@@ -83,7 +62,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
 
   // Generate Email Text for Technical Link Maintenance
   const generatedEmailText = activeStore
-    ? `@${activeStore.email || "loja@dpsp.com.br"}, Olá loja tudo bem?\nPor favor, liberem o acesso para que o(s) técnicos possa(m) reparar link de internet em sua loja. Abaixo, informo os dados dos técnicos para validação.`
+    ? `@${activeStore.email || "loja@dpsp.com.br"}, Olá loja tudo bem?\nPor favor, liberem o acesso para que o(s) técnicos possa(m) reparar link de internet em sua loja. Abaixo, informo os dados dos técnicos para validação.${techInfo ? `\n\nTécnico: ${techInfo}` : ""}`
     : "";
 
   // Separate main chamados designacoes (MPLS / DEDICADO) vs outras designacoes (MONITORADA / ISP)
@@ -117,8 +96,8 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
         className="panel-card" 
         style={{ 
           width: "100%", 
-          maxWidth: "1280px", 
-          maxHeight: "92vh", 
+          maxWidth: "1320px", 
+          maxHeight: "94vh", 
           display: "flex", 
           flexDirection: "column",
           gap: "14px",
@@ -137,9 +116,14 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
               <div style={{ width: "36px", height: "36px", borderRadius: "8px", backgroundColor: "var(--accent-red)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Store size={20} color="#fff" />
               </div>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.25rem", fontWeight: 700, margin: 0, color: "#fff" }}>
-                Consulta de Lojas
-              </h2>
+              <div>
+                <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "1.25rem", fontWeight: 700, margin: 0, color: "#fff" }}>
+                  Consulta de Lojas & VDs DPSP
+                </h2>
+                <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)" }}>
+                  Catálogo Corporativo • 2.085 Lojas Ativas • Serviços, Conectividade & Lideranças
+                </span>
+              </div>
             </div>
             
             <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", padding: "6px" }}>
@@ -163,8 +147,8 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
               }}
             >
               <option value="vd_desig">VD/Designação</option>
-              <option value="nome_ggl">Nome / GGL / GR</option>
-              <option value="cidade">Cidade / Estado</option>
+              <option value="nome_ggl">Nome / GGL / GR / Divisão</option>
+              <option value="cidade">Cidade / Estado / CD</option>
             </select>
 
             <div style={{ flex: 1, minWidth: "240px", position: "relative" }}>
@@ -180,7 +164,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
                   height: "38px",
                   fontSize: "0.85rem"
                 }}
-                placeholder="Qual a VD/Designação da loja? (ex: 490, 110003966086891, Casa Verde)"
+                placeholder="Qual a VD/Designação da loja? (ex: 490, 110003966086891, Casa Verde, CD Osasco)"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -228,7 +212,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
         {/* Quick Search Selector List if searching */}
         {query && filteredStores.length > 1 && (
           <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "6px" }}>
-            {filteredStores.slice(0, 10).map((st) => (
+            {filteredStores.slice(0, 12).map((st) => (
               <button
                 key={st.vd}
                 onClick={() => setSelectedVd(st.vd)}
@@ -249,7 +233,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
           </div>
         )}
 
-        {/* Store Detail Content Grid (Matching User Screenshot Layout) */}
+        {/* Store Detail Content Grid */}
         {activeStore ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", overflowY: "auto", paddingRight: "4px", flex: 1 }}>
             
@@ -263,135 +247,231 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
               alignItems: "center",
               justifyContent: "space-between"
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <Building2 size={22} color="var(--accent-red)" />
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "#fff", letterSpacing: "0.5px" }}>
-                  {activeStore.nome}
-                </h3>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "#fff", letterSpacing: "0.5px" }}>
+                      {activeStore.nome}
+                    </h3>
+                    <span style={{ 
+                      fontSize: "0.7rem", 
+                      fontWeight: 800, 
+                      padding: "2px 8px", 
+                      borderRadius: "4px",
+                      backgroundColor: activeStore.bandeira === "DPA" ? "#2563eb" : "#c8372d",
+                      color: "#fff"
+                    }}>
+                      {activeStore.bandeira || "DSP"}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)" }}>
+                    Divisão: {activeStore.nomeDiv} • Região: {activeStore.regiao} • CD Supridor: {activeStore.cdSupridor}
+                  </span>
+                </div>
               </div>
-              <span style={{ 
-                backgroundColor: "#2d3748", 
-                color: "#60a5fa", 
-                fontSize: "0.85rem", 
-                fontWeight: 800, 
-                padding: "4px 12px", 
-                borderRadius: "6px",
-                border: "1px solid rgba(96, 165, 250, 0.3)"
-              }}>
-                VD {activeStore.vd}
-              </span>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ 
+                  backgroundColor: "#2d3748", 
+                  color: "#60a5fa", 
+                  fontSize: "0.85rem", 
+                  fontWeight: 800, 
+                  padding: "4px 12px", 
+                  borderRadius: "6px",
+                  border: "1px solid rgba(96, 165, 250, 0.3)"
+                }}>
+                  VD {activeStore.vd}
+                </span>
+              </div>
             </div>
 
             {/* Main 2-Column Split Layout */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
               
-              {/* Left Column: Full Details Table */}
-              <div style={{ backgroundColor: "#111622", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "12px" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
-                  <tbody>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)", width: "35%" }}>🔹 VD da loja</td>
-                      <td style={{ padding: "7px 10px", color: "#fff", fontWeight: 700 }}>{activeStore.vd}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>📍 Nome da loja</td>
-                      <td style={{ padding: "7px 10px", color: "#fff", fontWeight: 600 }}>{activeStore.nome}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>📱 Celular</td>
-                      <td style={{ padding: "7px 10px", color: "#60a5fa", fontFamily: "monospace" }}>
-                        {activeStore.celular}
-                        {activeStore.celular !== "N/A" && (
-                          <button onClick={() => handleCopy(activeStore.celular, "celular")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
-                            <Copy size={11} />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>📞 Telefones</td>
-                      <td style={{ padding: "7px 10px", color: "#fff" }}>{activeStore.telefones}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>✉️ E-Mail</td>
-                      <td style={{ padding: "7px 10px", color: "#38bdf8" }}>{activeStore.email}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>🏠 Endereço</td>
-                      <td style={{ padding: "7px 10px", color: "#fff" }}>{activeStore.endereco}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>🏛️ Estado</td>
-                      <td style={{ padding: "7px 10px", color: "#fff" }}>{activeStore.estado}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>🌐 Região</td>
-                      <td style={{ padding: "7px 10px", color: "#fff" }}>{activeStore.regiao}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>⏰ Horário (2ª-6ª)</td>
-                      <td style={{ padding: "7px 10px", color: "#4ade80" }}>{activeStore.horario}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>📅 Sábado</td>
-                      <td style={{ padding: "7px 10px", color: "#4ade80" }}>{activeStore.sabado}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>📅 Domingo</td>
-                      <td style={{ padding: "7px 10px", color: "#4ade80" }}>{activeStore.domingo}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>⚡ Funcionamento</td>
-                      <td style={{ padding: "7px 10px", color: "#facc15" }}>{activeStore.funcionamento}</td>
-                    </tr>
-                    <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>💳 CNPJ</td>
-                      <td style={{ padding: "7px 10px", color: "#fff", fontFamily: "monospace" }}>{activeStore.cnpj}</td>
-                    </tr>
-                    <tr>
-                      <td style={{ padding: "7px 10px", color: "rgba(255,255,255,0.6)" }}>📮 CEP</td>
-                      <td style={{ padding: "7px 10px", color: "#fff", fontFamily: "monospace" }}>{activeStore.cep}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Right Column: GGL/GR Cards, Email Generator, Designações Chamado */}
+              {/* Left Column: Full Details Table & Services */}
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 
-                {/* Top Row: GGL & GR Contact Cards */}
+                {/* Store Spec Table */}
+                <div style={{ backgroundColor: "#111622", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "12px" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
+                    <tbody>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)", width: "35%" }}>🔹 VD da loja</td>
+                        <td style={{ padding: "6px 10px", color: "#fff", fontWeight: 700 }}>{activeStore.vd}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>📍 Nome da loja</td>
+                        <td style={{ padding: "6px 10px", color: "#fff", fontWeight: 600 }}>{activeStore.nome}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>📱 Celular</td>
+                        <td style={{ padding: "6px 10px", color: "#60a5fa", fontFamily: "monospace" }}>
+                          {activeStore.celular}
+                          {activeStore.celular !== "N/A" && (
+                            <button onClick={() => handleCopy(activeStore.celular, "celular")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
+                              <Copy size={11} />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>📞 Telefones</td>
+                        <td style={{ padding: "6px 10px", color: "#fff" }}>{activeStore.telefones}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>✉️ E-Mail Loja</td>
+                        <td style={{ padding: "6px 10px", color: "#38bdf8" }}>{activeStore.email}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>🏠 Endereço</td>
+                        <td style={{ padding: "6px 10px", color: "#fff" }}>{activeStore.endereco}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>🏛️ Estado / Região</td>
+                        <td style={{ padding: "6px 10px", color: "#fff" }}>{activeStore.estado} ({activeStore.regiao})</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>⏰ Horário (2ª-6ª)</td>
+                        <td style={{ padding: "6px 10px", color: "#4ade80" }}>{activeStore.horario}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>📅 Sábado / Domingo</td>
+                        <td style={{ padding: "6px 10px", color: "#4ade80" }}>{activeStore.sabado} / {activeStore.domingo}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>⚡ Funcionamento</td>
+                        <td style={{ padding: "6px 10px", color: "#facc15" }}>{activeStore.funcionamento}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>💳 CNPJ / CEP</td>
+                        <td style={{ padding: "6px 10px", color: "#fff", fontFamily: "monospace" }}>{activeStore.cnpj} | CEP {activeStore.cep}</td>
+                      </tr>
+                      <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                        <td style={{ padding: "6px 10px", color: "rgba(255,255,255,0.6)" }}>📦 CD Supridor / PDVs</td>
+                        <td style={{ padding: "6px 10px", color: "#e2e8f0" }}>
+                          <span style={{ fontWeight: 700, color: "#60a5fa" }}>{activeStore.cdSupridor}</span> ({activeStore.pdvsAtivos} PDVs Ativos)
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Delivery Channels Box */}
+                <div style={{ backgroundColor: "#111622", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "12px" }}>
+                  <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#fff", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Truck size={14} color="#f59e0b" />
+                    <span>Canais Digitais & Delivery (Pausar em queda de link)</span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    {[
+                      { name: "iFood", active: activeStore.ifood, color: "#ef4444" },
+                      { name: "Rappi", active: activeStore.rappi, color: "#f97316" },
+                      { name: "Uber", active: activeStore.uber, color: "#10b981" },
+                      { name: "Super Expressa", active: activeStore.superExpressa, color: "#3b82f6" }
+                    ].map((c, i) => (
+                      <span key={i} style={{ 
+                        fontSize: "0.7rem", 
+                        fontWeight: 700, 
+                        padding: "3px 8px", 
+                        borderRadius: "4px",
+                        backgroundColor: c.active ? "rgba(34, 197, 94, 0.15)" : "rgba(255, 255, 255, 0.05)",
+                        color: c.active ? "#4ade80" : "rgba(255, 255, 255, 0.3)",
+                        border: c.active ? "1px solid rgba(34, 197, 94, 0.3)" : "1px solid rgba(255, 255, 255, 0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px"
+                      }}>
+                        <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: c.active ? "#22c55e" : "#64748b" }}></span>
+                        {c.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Pharma Services & Regulations */}
+                <div style={{ backgroundColor: "#111622", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", padding: "12px" }}>
+                  <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "#fff", marginBottom: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Pill size={14} color="#a855f7" />
+                    <span>Serviços Farmacêuticos & Regulação</span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    {[
+                      { name: "Farmácia Popular", active: activeStore.farmaciaPopular },
+                      { name: "Psicotrópicos", active: activeStore.psicotropicos },
+                      { name: "Vacinas", active: activeStore.vacinas },
+                      { name: "Serviços Farmacêuticos", active: activeStore.servicosFarmaceuticos },
+                      { name: "EAC / PBM", active: activeStore.eac }
+                    ].map((s, idx) => (
+                      <span key={idx} style={{ 
+                        fontSize: "0.7rem", 
+                        fontWeight: 700, 
+                        padding: "3px 8px", 
+                        borderRadius: "4px",
+                        backgroundColor: s.active ? "rgba(168, 85, 247, 0.15)" : "rgba(255, 255, 255, 0.05)",
+                        color: s.active ? "#c084fc" : "rgba(255, 255, 255, 0.3)",
+                        border: s.active ? "1px solid rgba(168, 85, 247, 0.3)" : "1px solid rgba(255, 255, 255, 0.08)"
+                      }}>
+                        {s.active ? "✓ " : "✕ "}{s.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right Column: GGL/GR Cards with Emails, Email Generator, Designações Chamado */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                
+                {/* Top Row: GGL & GR Contact Cards with Email */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   {/* GGL Card */}
-                  <div style={{ backgroundColor: "#111622", border: "1px solid rgba(59, 130, 246, 0.3)", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
-                    <div style={{ fontSize: "0.7rem", textTransform: "uppercase", color: "#60a5fa", fontWeight: 700, marginBottom: "4px" }}>
+                  <div style={{ backgroundColor: "#111622", border: "1px solid rgba(59, 130, 246, 0.3)", borderRadius: "8px", padding: "12px" }}>
+                    <div style={{ fontSize: "0.68rem", textTransform: "uppercase", color: "#60a5fa", fontWeight: 700, marginBottom: "4px" }}>
                       🧑‍💼 GGL (Gerente Geral)
                     </div>
-                    <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>
                       {activeStore.ggl}
                     </div>
-                    <div style={{ fontSize: "0.82rem", color: "#38bdf8", fontFamily: "monospace" }}>
-                      {activeStore.gglPhone || "Sem telefone"}
+                    <div style={{ fontSize: "0.78rem", color: "#38bdf8", fontFamily: "monospace", marginBottom: "2px" }}>
+                      📞 {activeStore.gglPhone || "Sem telefone"}
                       {activeStore.gglPhone && (
-                        <button onClick={() => handleCopy(activeStore.gglPhone, "ggl")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
-                          <Copy size={12} />
+                        <button onClick={() => handleCopy(activeStore.gglPhone, "gglTel")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
+                          <Copy size={11} />
+                        </button>
+                      )}
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      ✉️ {activeStore.emailGgl}
+                      {activeStore.emailGgl !== "N/A" && (
+                        <button onClick={() => handleCopy(activeStore.emailGgl, "gglEmail")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
+                          <Copy size={11} />
                         </button>
                       )}
                     </div>
                   </div>
 
                   {/* GR Card */}
-                  <div style={{ backgroundColor: "#111622", border: "1px solid rgba(168, 85, 247, 0.3)", borderRadius: "8px", padding: "12px", textAlign: "center" }}>
-                    <div style={{ fontSize: "0.7rem", textTransform: "uppercase", color: "#c084fc", fontWeight: 700, marginBottom: "4px" }}>
+                  <div style={{ backgroundColor: "#111622", border: "1px solid rgba(168, 85, 247, 0.3)", borderRadius: "8px", padding: "12px" }}>
+                    <div style={{ fontSize: "0.68rem", textTransform: "uppercase", color: "#c084fc", fontWeight: 700, marginBottom: "4px" }}>
                       👤 GR (Gerente Regional)
                     </div>
-                    <div style={{ fontSize: "0.9rem", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>
+                    <div style={{ fontSize: "0.88rem", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>
                       {activeStore.gr}
                     </div>
-                    <div style={{ fontSize: "0.82rem", color: "#c084fc", fontFamily: "monospace" }}>
-                      {activeStore.grPhone || "Sem telefone"}
+                    <div style={{ fontSize: "0.78rem", color: "#c084fc", fontFamily: "monospace", marginBottom: "2px" }}>
+                      📞 {activeStore.grPhone || "Sem telefone"}
                       {activeStore.grPhone && (
-                        <button onClick={() => handleCopy(activeStore.grPhone, "gr")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
-                          <Copy size={12} />
+                        <button onClick={() => handleCopy(activeStore.grPhone, "grTel")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
+                          <Copy size={11} />
+                        </button>
+                      )}
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      ✉️ {activeStore.emailGr}
+                      {activeStore.emailGr !== "N/A" && (
+                        <button onClick={() => handleCopy(activeStore.emailGr, "grEmail")} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", marginLeft: "6px", cursor: "pointer" }}>
+                          <Copy size={11} />
                         </button>
                       )}
                     </div>
@@ -521,7 +601,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
         {/* Footer Actions */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "12px" }}>
           <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)" }}>
-            Base DPSP: {STORES_DATA.length.toLocaleString("pt-BR")} Lojas Ativas • Sincronizado com Relação de Lojas e Inventário de Links
+            Base DPSP: 2.085 Lojas Ativas • Sincronizado com Relação de Lojas e Inventário de Links
           </div>
 
           <div style={{ display: "flex", gap: "10px" }}>
