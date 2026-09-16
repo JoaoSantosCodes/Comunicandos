@@ -20,7 +20,10 @@ import {
   X,
   Maximize2,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Calendar,
+  Grid3x3,
+  ListChecks
 } from "lucide-react";
 
 export const CardGeneratorView = () => {
@@ -57,6 +60,19 @@ export const CardGeneratorView = () => {
     executiveEta: "16:30 (Previsão de Solução)",
     maintenanceWindow: "16/09/2026 das 02:00h às 04:30h",
     maintenanceImpact: "Indisponibilidade temporária de acesso ao SAP ERP durante a janela programada.",
+    maintenanceClosing: "Manutenção concluída com sucesso. Todos os sistemas foram validados e liberados.",
+    flashDate: new Date().toLocaleDateString("pt-BR"),
+    malhaRows: [
+      { hora: "08:00", status: "18 lojas restantes" },
+      { hora: "10:00", status: "09 lojas restantes" },
+      { hora: "12:00", status: "Malha finalizada" }
+    ],
+    malhaLojasCount: 8,
+    malhaLojasChecklist: [
+      { label: "Balcão", done: false },
+      { label: "Frente de Caixa (PDV)", done: false },
+      { label: "Etiquetagem de Produtos", done: false }
+    ],
     closingText: "Agradecemos a compreensão.",
     signature: "CENTRAL DE COMANDO",
     contactPhone: "(11) 5529-6003",
@@ -149,6 +165,30 @@ export const CardGeneratorView = () => {
         "Pedimos a gentileza de encerrar todas as sessões ativas no **SAP ERP** até às 01h55.",
         "Após o término da janela, os sistemas serão liberados automaticamente."
       ];
+    } else if (newMode === "flash") {
+      newHeader = "FLASH DE VENDAS";
+      newTitle = "CHECKLIST DE PLANTÃO — MALHA DE VENDAS";
+      newParagraphs = [
+        "Acompanhamento do plantão de vendas ao longo do dia, com checkpoints programados.",
+        "Equipes devem confirmar o status da malha em cada horário previsto.",
+        "Central de Comando consolidando os retornos das regionais."
+      ];
+    } else if (newMode === "malha") {
+      newHeader = "MALHA DE PREÇOS OPERACIONAL";
+      newTitle = "ACOMPANHAMENTO DA MALHA DE PREÇOS";
+      newParagraphs = [
+        "Processo de atualização de malha de preços em andamento nos Centros de Distribuição.",
+        "Equipe de Precificação acompanhando o volume de lojas restantes por horário.",
+        "Atualização final será publicada ao término do processo."
+      ];
+    } else if (newMode === "malha-lojas") {
+      newHeader = "MALHA DE PREÇOS — LOJAS";
+      newTitle = "CHECKLIST DE EXECUÇÃO NAS LOJAS";
+      newParagraphs = [
+        "Equipes de loja devem confirmar a execução dos itens da malha de preços.",
+        "Checklist cobre balcão, frente de caixa (PDV) e etiquetagem de produtos.",
+        "Central de Comando consolidando o retorno das lojas."
+      ];
     }
 
     setFormData(prev => ({
@@ -195,6 +235,30 @@ export const CardGeneratorView = () => {
 
   const handleClearImages = () => {
     setFormData(prev => ({ ...prev, leftLogoImage: null, rightLogoImage: null, fullFooterImage: null }));
+  };
+
+  const handleAddMalhaRow = () => {
+    setFormData(prev => ({ ...prev, malhaRows: [...prev.malhaRows, { hora: "", status: "" }] }));
+  };
+
+  const handleMalhaRowChange = (idx, field, value) => {
+    setFormData(prev => {
+      const updated = [...prev.malhaRows];
+      updated[idx] = { ...updated[idx], [field]: value };
+      return { ...prev, malhaRows: updated };
+    });
+  };
+
+  const handleRemoveMalhaRow = (idx) => {
+    setFormData(prev => ({ ...prev, malhaRows: prev.malhaRows.filter((_, i) => i !== idx) }));
+  };
+
+  const handleToggleMalhaLojasItem = (idx) => {
+    setFormData(prev => {
+      const updated = [...prev.malhaLojasChecklist];
+      updated[idx] = { ...updated[idx], done: !updated[idx].done };
+      return { ...prev, malhaLojasChecklist: updated };
+    });
   };
 
   const handleParagraphChange = (index, value) => {
@@ -418,13 +482,16 @@ ${formData.closingText}
           </div>
         </div>
 
-        {/* 4 GENERATOR MODE TABS */}
+        {/* GENERATOR MODE TABS */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
           {[
             { id: "loja", label: "1. LOJA", icon: Store, desc: "Para Operação de Varejo & Caixas", color: "#0284c7" },
             { id: "cds", label: "2. CENTROS DE DISTRIBUIÇÃO", icon: Truck, desc: "Para Logística, WMS & Esteira", color: "#059669" },
             { id: "executivo", label: "3. EXECUTIVO", icon: ShieldAlert, desc: "Para Diretoria & Briefing P1", color: "#dc2626" },
-            { id: "manutencao", label: "4. MANUTENÇÃO", icon: Wrench, desc: "Para Janelas Programadas TI", color: "#2563eb" }
+            { id: "manutencao", label: "4. MANUTENÇÃO", icon: Wrench, desc: "Para Janelas Programadas TI", color: "#2563eb" },
+            { id: "flash", label: "5. FLASH DE VENDAS", icon: Calendar, desc: "Checklist de Plantão por Horário", color: "#0891b2" },
+            { id: "malha", label: "6. MALHA OPERACIONAL", icon: Grid3x3, desc: "Acompanhamento de Malha de Preços", color: "#7c3aed" },
+            { id: "malha-lojas", label: "7. MALHA LOJAS", icon: ListChecks, desc: "Checklist de Execução nas Lojas", color: "#0f7a56" }
           ].map(m => {
             const IconComponent = m.icon;
             const isSel = generatorMode === m.id;
@@ -478,10 +545,14 @@ ${formData.closingText}
                 value={formData.type}
                 onChange={(e) => {
                   const newType = e.target.value;
+                  const modeLabel = {
+                    loja: "LOJAS", cds: "CDs", executivo: "EXECUTIVO", manutencao: "TI",
+                    flash: "FLASH DE VENDAS", malha: "MALHA OPERACIONAL", "malha-lojas": "MALHA LOJAS"
+                  }[generatorMode] || "STATUS";
                   const tagMap = {
-                    indisponibilidade: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : "INDISPONIBILIDADE DE STATUS!",
-                    atualizacao: generatorMode === "loja" ? "ATUALIZAÇÃO DE STATUS - LOJAS!" : generatorMode === "cds" ? "ATUALIZAÇÃO LOGÍSTICA!" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO DE INCIDENTE" : "ATUALIZAÇÃO DE STATUS!",
-                    normalizacao: generatorMode === "loja" ? "LOJAS NORMALIZADAS!" : generatorMode === "cds" ? "LOGÍSTICA NORMALIZADA!" : generatorMode === "executivo" ? "SERVIÇO EXECUTIVO NORMALIZADO!" : "SERVIÇO NORMALIZADO!",
+                    indisponibilidade: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : `INDISPONIBILIDADE — ${modeLabel}!`,
+                    atualizacao: generatorMode === "loja" ? "ATUALIZAÇÃO DE STATUS - LOJAS!" : generatorMode === "cds" ? "ATUALIZAÇÃO LOGÍSTICA!" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO DE INCIDENTE" : `ATUALIZAÇÃO — ${modeLabel}!`,
+                    normalizacao: generatorMode === "loja" ? "LOJAS NORMALIZADAS!" : generatorMode === "cds" ? "LOGÍSTICA NORMALIZADA!" : generatorMode === "executivo" ? "SERVIÇO EXECUTIVO NORMALIZADO!" : generatorMode === "manutencao" ? "MANUTENÇÃO CONCLUÍDA!" : `${modeLabel} FINALIZADA!`,
                     manutencao: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA CDs!" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : "MANUTENÇÃO PROGRAMADA!"
                   };
                   setFormData({
@@ -600,7 +671,7 @@ ${formData.closingText}
             </div>
           )}
 
-          {generatorMode === "manutencao" && (
+          {generatorMode === "manutencao" && formData.type !== "normalizacao" && (
             <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #2563eb" }}>
               <div className="form-group" style={{ marginBottom: "10px" }}>
                 <label className="form-label" style={{ color: "#2f6ea8" }}>Janela de Horário Programada</label>
@@ -619,6 +690,102 @@ ${formData.closingText}
                   value={formData.maintenanceImpact}
                   onChange={(e) => setFormData({ ...formData, maintenanceImpact: e.target.value })}
                 />
+              </div>
+            </div>
+          )}
+
+          {/* Manutenção Normalizada: card de conclusão, layout distinto da janela programada */}
+          {generatorMode === "manutencao" && formData.type === "normalizacao" && (
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #10b981" }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ color: "#0f7a56" }}>Texto de Conclusão da Manutenção</label>
+                <textarea
+                  className="form-textarea"
+                  rows={2}
+                  value={formData.maintenanceClosing}
+                  onChange={(e) => setFormData({ ...formData, maintenanceClosing: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* FLASH DE VENDAS */}
+          {generatorMode === "flash" && (
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #0891b2" }}>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" style={{ color: "#0891b2" }}>Data do Plantão</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={formData.flashDate}
+                  onChange={(e) => setFormData({ ...formData, flashDate: e.target.value })}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* MALHA OPERACIONAL: checkpoints dinâmicos horário -> status */}
+          {generatorMode === "malha" && (
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #7c3aed" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                <label className="form-label" style={{ color: "#7c3aed", margin: 0 }}>Checkpoints da Malha</label>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={handleAddMalhaRow}>
+                  <Plus size={12} />
+                  <span>Horário</span>
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {formData.malhaRows.map((row, idx) => (
+                  <div key={idx} style={{ display: "flex", gap: "6px" }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ width: "90px", flexShrink: 0 }}
+                      placeholder="08:00"
+                      value={row.hora}
+                      onChange={(e) => handleMalhaRowChange(idx, "hora", e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="Ex: 12 lojas restantes"
+                      value={row.status}
+                      onChange={(e) => handleMalhaRowChange(idx, "status", e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveMalhaRow(idx)}
+                      title="Remover checkpoint"
+                      style={{ backgroundColor: "rgba(200, 55, 45, 0.1)", border: "1px solid rgba(200, 55, 45, 0.25)", color: "#b3261e", borderRadius: "6px", padding: "8px", cursor: "pointer", flexShrink: 0 }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* MALHA LOJAS: contador + checklist de execução */}
+          {generatorMode === "malha-lojas" && (
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #059669" }}>
+              <div className="form-group" style={{ marginBottom: "10px" }}>
+                <label className="form-label" style={{ color: "#0f7a56" }}>Quantidade de Lojas na Malha</label>
+                <input
+                  type="number"
+                  className="form-input"
+                  value={formData.malhaLojasCount}
+                  onChange={(e) => setFormData({ ...formData, malhaLojasCount: Number(e.target.value) })}
+                />
+              </div>
+              <label className="form-label" style={{ color: "#0f7a56" }}>Checklist de Execução</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {formData.malhaLojasChecklist.map((item, idx) => (
+                  <label key={idx} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.85rem", color: "var(--text-main)", cursor: "pointer" }}>
+                    <input type="checkbox" checked={item.done} onChange={() => handleToggleMalhaLojasItem(idx)} />
+                    {item.label} {item.done ? "✅" : "⌛"}
+                  </label>
+                ))}
               </div>
             </div>
           )}

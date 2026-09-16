@@ -4,6 +4,7 @@ import { Search, Store, User, MapPin, X, Plus } from "lucide-react";
 
 export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
   const [query, setQuery] = useState("");
+  const [selectedVd, setSelectedVd] = useState(null);
 
   if (!isOpen) return null;
 
@@ -54,15 +55,15 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
           flexDirection: "column",
           gap: "16px",
           padding: "24px",
-          backgroundColor: "var(--color-brand-chrome)",
-          border: "1px solid var(--color-border)",
-          color: "var(--color-cream-light)"
+          backgroundColor: "var(--chrome)",
+          border: "1px solid rgba(245,234,216,0.15)",
+          color: "var(--text-on-chrome)"
         }}
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(245,234,216,0.12)", paddingBottom: "14px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "38px", height: "38px", borderRadius: "10px", backgroundColor: "var(--color-brand-red)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: "38px", height: "38px", borderRadius: "10px", backgroundColor: "var(--accent-red)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Store size={22} color="#fff" />
             </div>
             <div>
@@ -101,17 +102,19 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
         {/* Stores Grid / List */}
         <div style={{ overflowY: "auto", display: "flex", flexDirection: "column", gap: "10px", paddingRight: "4px", flex: 1 }}>
           {filteredStores.map(st => (
-            <div 
+            <div
               key={st.vd}
+              onClick={() => setSelectedVd(st.vd)}
               style={{
                 backgroundColor: "rgba(0,0,0,0.25)",
-                border: selectedVd === st.vd ? "2px solid var(--color-brand-red)" : "1px solid rgba(245,234,216,0.1)",
+                border: selectedVd === st.vd ? "2px solid var(--accent-red)" : "1px solid rgba(245,234,216,0.1)",
                 borderRadius: "12px",
                 padding: "14px 16px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: "16px",
+                cursor: "pointer",
                 transition: "all 0.15s"
               }}
             >
@@ -148,7 +151,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
               <button 
                 className="btn btn-primary btn-sm"
                 onClick={() => handleConfirmSelect(st)}
-                style={{ shrink: 0, display: "flex", alignItems: "center", gap: "6px", backgroundColor: "var(--color-brand-red)", border: "none" }}
+                style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "6px", backgroundColor: "var(--accent-red)", border: "none" }}
               >
                 <Plus size={14} />
                 <span>Vincular</span>
@@ -165,7 +168,11 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
 
         {/* Footer */}
         <div style={{ display: "flex", justifyContent: "flex-end", borderTop: "1px solid rgba(245,234,216,0.12)", paddingTop: "12px" }}>
-          <button className="btn btn-secondary btn-sm" onClick={onClose} style={{ color: "#fff" }}>
+          <button
+            className="btn btn-sm"
+            onClick={onClose}
+            style={{ backgroundColor: "var(--chrome-2)", border: "1px solid rgba(245,234,216,0.15)", color: "var(--text-on-chrome)" }}
+          >
             Fechar
           </button>
         </div>

@@ -1,7 +1,9 @@
 // Camada de integração HTTP REST com o backend Spring (AlertsController / MongoDB)
 // Suporta fallback para localStorage quando o backend Spring não estiver acessível
 
-const API_BASE_URL = "http://localhost:8080/api/alerts";
+// Porta real do backend Spring (server.port em application.properties do
+// projeto "consulta lojas java"), não 8080.
+const API_BASE_URL = "http://localhost:8081/api/alerts";
 
 export const apiService = {
   // Carrega alertas executivos do Spring (/api/alerts/aexec)
