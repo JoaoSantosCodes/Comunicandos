@@ -2,6 +2,14 @@ import React from "react";
 import { useIncidentContext } from "../../context/useIncidentContext";
 import { Megaphone, ExternalLink } from "lucide-react";
 
+// Cards vindos do CardGeneratorView não têm um campo "impact" genérico — o resumo
+// real do que foi comunicado está no primeiro parágrafo escrito pelo operador.
+const getSummary = (comm) => {
+  if (comm.impact) return comm.impact;
+  const first = Array.isArray(comm.paragraphs) ? comm.paragraphs[0] : null;
+  return first ? first.replace(/\*\*/g, "").replace(/\*/g, "") : "";
+};
+
 export const CommunicationsView = () => {
   const { communications, setActiveTab, setActiveCardDraft } = useIncidentContext();
 
@@ -34,7 +42,7 @@ export const CommunicationsView = () => {
                 {comm.title}
               </h3>
               <p style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                {comm.impact}
+                {getSummary(comm)}
               </p>
             </div>
 

@@ -2,6 +2,16 @@ import React, { useState } from "react";
 import { useIncidentContext } from "../../context/useIncidentContext";
 import { Send, CheckCircle2, ShieldCheck } from "lucide-react";
 
+const MODE_LABELS = {
+  loja: "Lojas & Varejo",
+  cds: "CDs & Logística",
+  executivo: "Briefing Executivo",
+  manutencao: "Manutenção",
+  flash: "Flash de Vendas",
+  malha: "Malha Operacional",
+  "malha-lojas": "Malha de Preços — Lojas"
+};
+
 export const PublishingCentralView = () => {
   const { communications, setActiveTab } = useIncidentContext();
   const latestComm = communications[0] || {};
@@ -66,7 +76,7 @@ export const PublishingCentralView = () => {
             {latestComm.title || "INDISPONIBILIDADE INTEGRACAO SAP"}
           </h4>
           <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "4px" }}>
-            Sistema: {latestComm.system} | Processo: {latestComm.process}
+            Modo: {MODE_LABELS[latestComm.generatorMode] || "—"} | Tipo: {latestComm.type ? latestComm.type.toUpperCase() : "—"}
           </p>
         </div>
 
