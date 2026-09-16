@@ -403,6 +403,45 @@ ${formData.closingText}
     }
   };
 
+  // Gestão de Crise suporta gerar os 2 PNGs (Abertura + Normalização) em sequência a
+  // partir dos mesmos campos formais preenchidos, sem precisar trocar o tipo manualmente
+  // e clicar em baixar duas vezes — replica o comportamento descrito na documentação de
+  // referência ("Suporta geração simultânea de Abertura e Normalização").
+  const [generatingDualPng, setGeneratingDualPng] = useState(false);
+
+  const handleGenerateCrisisDualPng = async () => {
+    if (!canvasRef.current || generatingDualPng) return;
+    const originalType = formData.type;
+    const originalHeaderTag = formData.headerTag;
+    setGeneratingDualPng(true);
+
+    const waitForRepaint = () => new Promise(resolve => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+
+    const captureFor = async (type, headerTag) => {
+      setFormData(prev => ({ ...prev, type, headerTag }));
+      await waitForRepaint();
+      const dataUrl = await toPng(canvasRef.current, { quality: 0.98, pixelRatio: 2 });
+      const link = document.createElement("a");
+      link.download = `card-crise-${type}-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    };
+
+    try {
+      await captureFor("indisponibilidade", "CRISE ABERTA — INDISPONIBILIDADE");
+      await captureFor("normalizacao", "CRISE ENCERRADA — NORMALIZADO");
+      if (showToast) showToast("2 PNGs gerados: Abertura e Normalização da crise!", "success");
+    } catch (err) {
+      console.error("Erro ao gerar PNGs de abertura/normalização:", err);
+      if (showToast) showToast("Não foi possível gerar os 2 PNGs. Tente novamente.", "error");
+    } finally {
+      setFormData(prev => ({ ...prev, type: originalType, headerTag: originalHeaderTag }));
+      setGeneratingDualPng(false);
+    }
+  };
+
   const handlePublish = () => {
     createCommunicationCard({
       ...formData,
@@ -914,6 +953,18 @@ ${formData.closingText}
                   </div>
                 ))}
               </div>
+
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleGenerateCrisisDualPng}
+                disabled={generatingDualPng}
+                title="Gera 2 arquivos PNG em sequência: um card de Abertura (Indisponibilidade) e um de Normalização, usando os mesmos campos formais preenchidos acima"
+                style={{ marginTop: "12px", width: "100%", backgroundColor: "#991b1b", borderColor: "#991b1b", opacity: generatingDualPng ? 0.6 : 1, cursor: generatingDualPng ? "wait" : "pointer" }}
+              >
+                <Download size={14} />
+                <span>{generatingDualPng ? "Gerando os 2 PNGs..." : "Gerar Abertura + Normalização (2 PNGs)"}</span>
+              </button>
             </div>
           )}
 
