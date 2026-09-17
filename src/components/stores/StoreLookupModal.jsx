@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { STORES_DATA } from "../../data/storesData";
-import { 
-  Search, Store, User, Mail, X, Plus, Copy, Check, Phone, MapPin, 
-  Clock, ShieldAlert, Cpu, ExternalLink, Filter, Building2, CheckCircle2,
-  ShoppingBag, Syringe, Pill, Truck, Radio, Layers
-} from "lucide-react";
+import { Search, Store, X, Copy, Check, Building2, Pill, Truck } from "lucide-react";
 
 const norm = (value) => (value || "").toString().toLowerCase().trim();
 
@@ -14,7 +10,6 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
   const [filterMode, setFilterMode] = useState("vd_desig");
   const [selectedVd, setSelectedVd] = useState("490");
   const [copiedField, setCopiedField] = useState(null);
-  const [techInfo, setTechInfo] = useState("");
 
   // Search logic supporting VD, Nome, Designação, GGL, GR, Cidade, Divisão
   const filteredStores = useMemo(() => {
@@ -46,11 +41,39 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
 
   if (!isOpen) return null;
 
-  const handleCopy = (text, fieldName) => {
+  const handleCopy = async (text, fieldName) => {
     if (!text || text === "N/A") return;
-    navigator.clipboard.writeText(text);
-    setCopiedField(fieldName);
-    setTimeout(() => setCopiedField(null), 2000);
+    let success = false;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        success = true;
+      }
+    } catch {
+      // Fallback para contextos onde a Clipboard API é bloqueada
+    }
+
+    if (!success) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        success = document.execCommand("copy");
+        document.body.removeChild(textArea);
+      } catch (err) {
+        console.error("Erro ao copiar texto:", err);
+      }
+    }
+
+    if (success) {
+      setCopiedField(fieldName);
+      setTimeout(() => setCopiedField(null), 2000);
+    }
   };
 
   const handleConfirmSelect = (store) => {
@@ -62,7 +85,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
 
   // Generate Email Text for Technical Link Maintenance
   const generatedEmailText = activeStore
-    ? `@${activeStore.email || "loja@dpsp.com.br"}, Olá loja tudo bem?\nPor favor, liberem o acesso para que o(s) técnicos possa(m) reparar link de internet em sua loja. Abaixo, informo os dados dos técnicos para validação.${techInfo ? `\n\nTécnico: ${techInfo}` : ""}`
+    ? `@${activeStore.email || "loja@dpsp.com.br"}, Olá loja tudo bem?\nPor favor, liberem o acesso para que o(s) técnicos possa(m) reparar link de internet em sua loja. Abaixo, informo os dados dos técnicos para validação.`
     : "";
 
   // Separate main chamados designacoes (MPLS / DEDICADO) vs outras designacoes (MONITORADA / ISP)
@@ -121,7 +144,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
                   Consulta de Lojas & VDs DPSP
                 </h2>
                 <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)" }}>
-                  Catálogo Corporativo • 2.085 Lojas Ativas • Serviços, Conectividade & Lideranças
+                  Catálogo Corporativo • {STORES_DATA.length.toLocaleString("pt-BR")} Lojas Ativas • Serviços, Conectividade & Lideranças
                 </span>
               </div>
             </div>
@@ -601,7 +624,7 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
         {/* Footer Actions */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "12px" }}>
           <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)" }}>
-            Base DPSP: 2.085 Lojas Ativas • Sincronizado com Relação de Lojas e Inventário de Links
+            Base DPSP: {STORES_DATA.length.toLocaleString("pt-BR")} Lojas Ativas • Sincronizado com Relação de Lojas e Inventário de Links
           </div>
 
           <div style={{ display: "flex", gap: "10px" }}>

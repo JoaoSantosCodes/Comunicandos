@@ -61,6 +61,7 @@ export const CardGeneratorView = () => {
     executiveEta: "16:30 (Previsão de Solução)",
     maintenanceWindow: "16/09/2026 das 02:00h às 04:30h",
     maintenanceImpact: "Indisponibilidade temporária de acesso ao SAP ERP durante a janela programada.",
+    maintenanceClosing: "Manutenção concluída com sucesso. Todos os sistemas foram validados e liberados.",
     flashDate: new Date().toLocaleDateString("pt-BR"),
     flashSlots: [
       { hora: "00h15", status: "OK" },
