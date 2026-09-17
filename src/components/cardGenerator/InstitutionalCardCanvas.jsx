@@ -1,5 +1,7 @@
 import React from "react";
 import { AlertTriangle, CheckCircle2, Store, Truck, Wrench, ShieldAlert, Calendar, Grid3x3, ListChecks, Siren } from "lucide-react";
+import MaintenanceNotice from "./MaintenanceNotice";
+import DpspCard662x1181 from "./DpspCard662x1181";
 
 const MODE_TAGS = {
   loja: "🏪 OPERAÇÃO DE LOJAS",
@@ -16,6 +18,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
   const {
     generatorMode = "cds", // 'loja', 'cds', 'executivo', 'manutencao'
     type = "atualizacao", // indisponibilidade, atualizacao, normalizacao, manutencao
+    layoutPattern = "pptx_2026", // 'pptx_2026' (Novo Padrão 2026) or 'classic'
     headerTag,
     title = "INTEGRAÇÃO PEOPLESOFT E EWM",
     paragraphs = [],
@@ -44,7 +47,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
     crisisTimeActivation = "",
     crisisTimeClosure = "",
     crisisUpdateRows = [],
-    closingText = "Agradecemos a compreensão.",
+    closingText = "Agradecemos a compreensão,",
     signature = "CENTRAL DE COMANDO",
     // Color Palette Props
     palettePreset = "default",
@@ -76,7 +79,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
             outerBg: "#2e3b5b", // Deep Navy Slate
             supportBg: "#e6f3fe", // Soft Ice Blue
             supportTextColor: "#2e3b5b",
-            defaultTag: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : "INDISPONIBILIDADE DE STATUS!",
+            defaultTag: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : "INSTABILIDADE IDENTIFICADA",
             Icon: generatorMode === "loja" ? Store : generatorMode === "cds" ? Truck : generatorMode === "executivo" ? ShieldAlert : generatorMode === "flash" ? Calendar : generatorMode === "malha" ? Grid3x3 : generatorMode === "malha-lojas" ? ListChecks : AlertTriangle
           };
         case "atualizacao":
@@ -86,7 +89,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
             outerBg: "#2e3b5b",
             supportBg: "#e6f3fe",
             supportTextColor: "#2e3b5b",
-            defaultTag: generatorMode === "loja" ? "ATUALIZAÇÃO DE STATUS - LOJAS!" : generatorMode === "cds" ? "ATUALIZAÇÃO LOGÍSTICA!" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO DE INCIDENTE" : "ATUALIZAÇÃO DE STATUS!",
+            defaultTag: generatorMode === "loja" ? "COMUNICADO PARA LOJAS!" : generatorMode === "cds" ? "COMUNICADO CENTROS DE DISTRIBUIÇÃO!" : generatorMode === "executivo" ? "INFORMAÇÃO IMPORTANTE!" : "INFORMAÇÃO IMPORTANTE!",
             Icon: generatorMode === "loja" ? Store : generatorMode === "cds" ? Truck : generatorMode === "executivo" ? ShieldAlert : generatorMode === "flash" ? Calendar : generatorMode === "malha" ? Grid3x3 : generatorMode === "malha-lojas" ? ListChecks : AlertTriangle
           };
         case "normalizacao":
@@ -107,7 +110,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
             outerBg: "#2e3b5b",
             supportBg: "#e6f3fe",
             supportTextColor: "#2e3b5b",
-            defaultTag: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA CDs!" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : "MANUTENÇÃO PROGRAMADA!",
+            defaultTag: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : "MANUTENÇÃO PROGRAMADA",
             Icon: Wrench
           };
         default:
@@ -117,7 +120,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
             outerBg: "#2e3b5b",
             supportBg: "#e6f3fe",
             supportTextColor: "#2e3b5b",
-            defaultTag: "ATUALIZAÇÃO DE STATUS!",
+            defaultTag: "INFORMAÇÃO IMPORTANTE!",
             Icon: AlertTriangle
           };
       }
@@ -174,7 +177,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
       outerBg: "#2e3b5b",
       supportBg: "#e6f3fe",
       supportTextColor: "#2e3b5b",
-      defaultTag: "ATUALIZAÇÃO DE STATUS!",
+      defaultTag: "INFORMAÇÃO IMPORTANTE!",
       Icon: AlertTriangle
     };
   };
@@ -184,6 +187,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
   if (generatorMode === "crise") styleConfig.Icon = Siren;
   const BadgeIconComponent = styleConfig.Icon;
   const activeHeaderTag = headerTag || styleConfig.defaultTag;
+  const isIncidentType = type === "indisponibilidade";
 
   // Render formatted text for *bold* (single or double asterisks - matching Java ImageGenerationService).
   // Content between markers excludes "*" and "." so a stray, unpaired asterisk (e.g. a bullet
@@ -209,7 +213,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
     return nodes;
   };
 
-  // Tight Footer Logo Renderer (Images fill footer height cleanly without expanding card borders)
+  // Tight Footer Logo Renderer for Classic Layout
   const renderFooterLogos = () => {
     // 1. Full Image Banner Uploaded
     if (fullFooterImage) {
@@ -290,6 +294,463 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
     );
   };
 
+  // Common inner body block for card modes
+  const renderCardBody = () => (
+    <>
+      {/* MODE 1: LOJA BODY */}
+      {generatorMode === "loja" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ backgroundColor: "#f8fafc", padding: "12px", borderRadius: "8px", borderLeft: `4px solid ${isIncidentType ? "#e8505b" : "#242938"}` }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: isIncidentType ? "#e8505b" : "#242938", textTransform: "uppercase", display: "block" }}>📍 LOJAS AFETADAS / REGIONAL</span>
+            <strong style={{ fontSize: "0.9rem", color: "#0f172a" }}>{affectedStores}</strong>
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+
+          {storeActionGuide && (
+            <div style={{ backgroundColor: "#fffbe6", padding: "12px", borderRadius: "8px", border: "1px solid #fef08a", color: "#854d0e", fontSize: "0.82rem" }}>
+              <strong style={{ display: "block", color: "#a16207", marginBottom: "2px" }}>⚠️ ORIENTAÇÃO PARA A FRENTE DE LOJA:</strong>
+              {storeActionGuide}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* MODE 2: CDS BODY */}
+      {generatorMode === "cds" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${isIncidentType ? "#e8505b" : "#242938"}` }}>
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, color: isIncidentType ? "#e8505b" : "#242938", textTransform: "uppercase", display: "block" }}>UNIDADES IMPACTADAS</span>
+              <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>
+                {Array.isArray(affectedCDs) ? affectedCDs.join(", ") : affectedCDs}
+              </strong>
+            </div>
+            <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${isIncidentType ? "#e8505b" : "#242938"}` }}>
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, color: isIncidentType ? "#e8505b" : "#242938", textTransform: "uppercase", display: "block" }}>PROCESSO LOGÍSTICO</span>
+              <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{cdProcess}</strong>
+            </div>
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* MODE 3: EXECUTIVO BODY */}
+      {generatorMode === "executivo" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", fontSize: "0.85rem", color: "#334155" }}>
+          <div style={{ backgroundColor: "#f1f5f9", padding: "12px", borderRadius: "8px", borderTop: "1px solid #cbd5e1", borderRight: "1px solid #cbd5e1", borderBottom: "1px solid #cbd5e1", borderLeft: `4px solid ${isIncidentType ? "#e8505b" : "#242938"}` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#475569", textTransform: "uppercase" }}>IMPACTO DE NEGÓCIO</span>
+              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: isIncidentType ? "#e8505b" : "#242938" }}>ETA: {executiveEta}</span>
+            </div>
+            <strong style={{ fontSize: "0.88rem", color: "#0f172a" }}>{executiveImpact}</strong>
+          </div>
+
+          <div style={{ backgroundColor: "#fafafa", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>CAUSA RAIZ & DIAGNÓSTICO</span>
+            <p style={{ margin: 0, fontSize: "0.82rem", color: "#334155" }}>{executiveRootCause}</p>
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* MODE 4: MANUTENÇÃO BODY — janela programada vs. conclusão (normalizada) */}
+      {generatorMode === "manutencao" && type !== "normalizacao" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ backgroundColor: "#eff6ff", padding: "12px", borderRadius: "8px", borderTop: "1px solid #bfdbfe", borderRight: "1px solid #bfdbfe", borderBottom: "1px solid #bfdbfe", borderLeft: "4px solid #2563eb", textAlign: "center" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#1d4ed8", textTransform: "uppercase", display: "block" }}>🗓️ JANELA DA MANUTENÇÃO PROGRAMADA</span>
+            <strong style={{ fontSize: "0.95rem", color: "#1e40af" }}>{maintenanceWindow}</strong>
+          </div>
+
+          <div style={{ backgroundColor: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#475569", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>IMPACTO PREVISTO DURANTE A JANELA</span>
+            <p style={{ margin: 0, fontSize: "0.83rem", color: "#1e293b" }}>{maintenanceImpact}</p>
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {generatorMode === "manutencao" && type === "normalizacao" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ backgroundColor: "#dcfce7", padding: "12px", borderRadius: "8px", border: "1px solid #86efac", textAlign: "center" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#15803d", textTransform: "uppercase", display: "block" }}>✅ CONCLUSÃO DE MANUTENÇÃO PROGRAMADA</span>
+            <strong style={{ fontSize: "0.95rem", color: "#14532d" }}>{maintenanceWindow}</strong>
+          </div>
+
+          <p style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
+            {renderFormattedText(maintenanceClosing)}
+          </p>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* MODE 5: FLASH DE VENDAS — checklist fixo de plantão por horário */}
+      {generatorMode === "flash" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ backgroundColor: "#ecfeff", padding: "10px", borderRadius: "8px", border: "1px solid #a5f3fc", textAlign: "center" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#0891b2", textTransform: "uppercase", display: "block" }}>📅 DATA DO PLANTÃO</span>
+            <strong style={{ fontSize: "0.95rem", color: "#0e7490" }}>{flashDate}</strong>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+            {(flashSlots && flashSlots.length > 0 ? flashSlots : [
+              { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
+              { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
+              { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
+              { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
+            ]).map((slot, idx) => {
+              const st = (slot.status || "").trim();
+              const isOk = /^ok/i.test(st) || st === "✅" || /^conclu/i.test(st);
+              const isPending = /^pend/i.test(st) || /^atras/i.test(st) || st === "🔴";
+              const isWarning = /^acomp/i.test(st) || /^em /i.test(st) || st === "🟡";
+
+              return (
+                <div key={idx} style={{ 
+                  backgroundColor: isOk ? "#f0fdf4" : isPending ? "#fef2f2" : isWarning ? "#fffbeb" : "#f8fafc", 
+                  border: isOk ? "1px solid #bbf7d0" : isPending ? "1px solid #fecaca" : isWarning ? "1px solid #fef08a" : "1px solid #e2e8f0", 
+                  borderRadius: "6px", 
+                  padding: "5px 8px", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "space-between", 
+                  fontSize: "0.72rem" 
+                }}>
+                  <span style={{ fontWeight: 700, color: "#0891b2" }}>{slot.hora}</span>
+                  <span style={{ 
+                    fontWeight: st ? 800 : 400, 
+                    color: isOk ? "#16a34a" : isPending ? "#dc2626" : isWarning ? "#d97706" : "#94a3b8" 
+                  }}>
+                    {st || "—"}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* MODE 6: MALHA OPERACIONAL — tabela dinâmica horário -> status */}
+      {generatorMode === "malha" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {malhaRows.map((row, idx) => {
+              const isFinal = /finaliz/i.test(row.status || "");
+              return (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ backgroundColor: isIncidentType ? "#e8505b" : "#242938", color: "#fff", fontWeight: 800, fontSize: "0.78rem", padding: "4px 10px", borderRadius: "6px", minWidth: "56px", textAlign: "center" }}>
+                    {row.hora}
+                  </span>
+                  <span style={{ fontSize: "0.82rem", fontWeight: isFinal ? 800 : 500, color: isFinal ? "#15803d" : "#334155" }}>
+                    {row.status}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* MODE 7: MALHA LOJAS — contador + checklist com status ✅/⌛ */}
+      {generatorMode === "malha-lojas" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
+          <div style={{ backgroundColor: "#f0fdf4", padding: "12px", borderRadius: "8px", border: "1px solid #bbf7d0", textAlign: "center" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#15803d", textTransform: "uppercase", display: "block" }}>🏬 LOJAS NA MALHA</span>
+            <strong style={{ fontSize: "1.4rem", color: "#14532d" }}>{malhaLojasCount}</strong>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {malhaLojasChecklist.map((item, idx) => (
+              <div key={idx} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a" }}>{item.label}</span>
+                <span style={{ fontSize: "1rem" }}>{item.done ? "✅" : "⌛"}</span>
+              </div>
+            ))}
+          </div>
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+
+      {/* MODE 8: GESTÃO DE CRISE — campos formais de abertura/encerramento + linha do tempo de atualizações */}
+      {generatorMode === "crise" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", fontSize: "0.85rem", color: "#334155" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${isIncidentType ? "#e8505b" : "#242938"}` }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: isIncidentType ? "#e8505b" : "#242938", textTransform: "uppercase", display: "block" }}>Nº DO INCIDENTE</span>
+              <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{crisisIncidentNumber || "—"}</strong>
+            </div>
+            <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${isIncidentType ? "#e8505b" : "#242938"}` }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: isIncidentType ? "#e8505b" : "#242938", textTransform: "uppercase", display: "block" }}>UNIDADES AFETADAS</span>
+              <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{crisisAffectedUnits || "—"}</strong>
+            </div>
+          </div>
+
+          {crisisCause && (
+            <div style={{ backgroundColor: "#fafafa", padding: "10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>CAUSA</span>
+              <p style={{ margin: 0, fontSize: "0.8rem", color: "#334155" }}>{crisisCause}</p>
+            </div>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+            <div style={{ fontSize: "0.78rem" }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>RESP. TÉCNICO</span>
+              <strong style={{ color: "#0f172a" }}>{crisisTechnicalResponsible || "—"}</strong>
+            </div>
+            <div style={{ fontSize: "0.78rem" }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>RESP. COMMAND</span>
+              <strong style={{ color: "#0f172a" }}>{crisisCommandResponsible || "—"}</strong>
+            </div>
+          </div>
+
+          {crisisRoomLink && (
+            <div style={{ fontSize: "0.78rem", color: isIncidentType ? "#e8505b" : "#242938", fontWeight: 700, wordBreak: "break-all" }}>
+              🔗 Sala de Crise: {crisisRoomLink}
+            </div>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px" }}>
+            <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
+              <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Incidente</span>
+              <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeIncident || "—"}</strong>
+            </div>
+            <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
+              <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Acionamento</span>
+              <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeActivation || "—"}</strong>
+            </div>
+            <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
+              <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Encerramento</span>
+              <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeClosure || "—"}</strong>
+            </div>
+          </div>
+
+          {crisisUpdateRows.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase" }}>LINHA DO TEMPO</span>
+              {crisisUpdateRows.map((row, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
+                  <span style={{ backgroundColor: isIncidentType ? "#e8505b" : "#242938", color: "#fff", fontWeight: 800, fontSize: "0.74rem", padding: "3px 8px", borderRadius: "6px", minWidth: "50px", textAlign: "center", flexShrink: 0 }}>
+                    {row.hora}
+                  </span>
+                  <span style={{ fontSize: "0.8rem", color: "#334155", lineHeight: 1.4 }}>{row.texto}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {paragraphs.map((p, idx) => (
+            <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "left" }}>
+              {renderFormattedText(p)}
+            </p>
+          ))}
+        </div>
+      )}
+    </>
+  );
+
+  // ---------------------------------------------------------------------------
+  // LAYOUT PATTERN 0: PURE REACT + CSS (Estrutura Recomendada pelo Usuário)
+  // ---------------------------------------------------------------------------
+  if (layoutPattern === "pure_css") {
+    const cleanSystemName = title.replace(/^SISTEMA:\s*/i, "");
+
+    return (
+      <MaintenanceNotice
+        canvasRef={canvasRef}
+        date={flashDate || "20/08"}
+        headerTag={activeHeaderTag}
+        system={cleanSystemName}
+        day="XX/XX (dia da semana)"
+        start="XXh"
+        endDate="XX/XX (dia da semana)"
+        end="XXh"
+        impact="XXXXX"
+        phone={contactPhone}
+        type={type}
+        closingText={closingText}
+        signature={signature}
+        paragraphs={paragraphs}
+      />
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // LAYOUT PATTERN 0B: REPRODUÇÃO VETORIAL 1:1 (SVG + React 662x1181px)
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // LAYOUT PATTERN 1 & 0B: OFICIAL NOVO PADRÃO VETORIAL 1:1 (662×1181 px)
+  // ---------------------------------------------------------------------------
+  if (layoutPattern === "pptx_2026" || layoutPattern === "svg_662") {
+    const cleanSystemName = title.replace(/^SISTEMA:\s*/i, "");
+    const scaleFactor = 420 / 662; // 0.63444
+    const scaledHeight = Math.round(1181 * scaleFactor); // 749px
+
+    // Montagem dinâmica dos parágrafos contínuos para o modelo 662x1181
+    let dynamicParagraphs = paragraphs;
+    if (!paragraphs || paragraphs.length === 0) {
+      if (generatorMode === "loja") {
+        dynamicParagraphs = [
+          `Informamos a situação da operação nas **Lojas e Regionais**.`,
+          affectedStores ? `**Lojas / Regionais Afetadas:** ${affectedStores}` : null,
+          storeActionGuide ? `**Orientação para Frente de Loja:** ${storeActionGuide}` : null,
+          `Solicitamos o acompanhamento dos chamados operacionais junto aos caixas.`
+        ].filter(Boolean);
+      } else if (generatorMode === "cds") {
+        const cdUnits = Array.isArray(affectedCDs) ? affectedCDs.join(", ") : affectedCDs;
+        dynamicParagraphs = [
+          `Informamos a situação operacional nos **Centros de Distribuição**.`,
+          cdUnits ? `**Unidades Impactadas:** ${cdUnits}` : null,
+          cdProcess ? `**Processo Logístico / WMS:** ${cdProcess}` : null,
+          `As equipes de Logística e WMS acompanham o fluxo de expedição.`
+        ].filter(Boolean);
+      } else if (generatorMode === "executivo") {
+        dynamicParagraphs = [
+          `Informamos o briefing executivo para o sistema **${cleanSystemName}**.`,
+          executiveImpact ? `**Resumo do Impacto:** ${executiveImpact}` : null,
+          executiveRootCause ? `**Causa Raiz Técnica:** ${executiveRootCause}` : null,
+          executiveEta ? `**Previsão (ETA):** ${executiveEta}` : null,
+          `A Central de Comando segue monitorando o plano de ação.`
+        ].filter(Boolean);
+      } else if (generatorMode === "manutencao") {
+        dynamicParagraphs = [
+          `Informamos que será realizada uma manutenção programada no(s) sistema(s) **${cleanSystemName}**.`,
+          `A atividade tem como objetivo implementar melhorias e atualizações no serviço.`,
+          maintenanceWindow ? `**Janela de Manutenção:** ${maintenanceWindow}` : null,
+          maintenanceImpact ? `**Impacto Previsto:** ${maintenanceImpact}` : null,
+          `Não é necessária a abertura de chamados relacionados à indisponibilidade durante a janela de manutenção.`
+        ].filter(Boolean);
+      }
+    }
+
+    // Flash de Vendas, Malha Operacional, Malha Lojas e Gestão de Crise têm UI dedicada
+    // (checkpoints por horário, linhas da malha, checklist, campos formais de crise) como
+    // fonte primária de dado. Diferente dos modos acima, aqui SEMPRE reconstruímos os
+    // parágrafos a partir dos campos estruturados — não só quando "paragraphs" está vazio —
+    // porque cada um desses 4 modos já vem com parágrafos padrão preenchidos, o que fazia o
+    // card sempre mostrar um texto genérico e nunca os checkpoints/linhas/checklist/timeline
+    // que o operador realmente preencheu no formulário.
+    if (generatorMode === "flash") {
+      const slots = flashSlots.length > 0 ? flashSlots : [
+        { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
+        { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
+        { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
+        { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
+      ];
+      dynamicParagraphs = [
+        `Acompanhamento do plantão de vendas — checkpoints do dia **${flashDate}**.`,
+        ...slots.map(s => `**${s.hora}:** ${(s.status || "").trim() || "—"}`)
+      ];
+    } else if (generatorMode === "malha") {
+      dynamicParagraphs = [
+        `Acompanhamento da Malha de Preços por horário nos Centros de Distribuição.`,
+        ...malhaRows.map(r => `**${r.hora}:** ${r.status || "—"}`)
+      ];
+    } else if (generatorMode === "malha-lojas") {
+      dynamicParagraphs = [
+        `Malha de Preços — **${malhaLojasCount} lojas** na malha.`,
+        ...malhaLojasChecklist.map(item => `${item.done ? "✅" : "⌛"} ${item.label}`)
+      ];
+    } else if (generatorMode === "crise") {
+      dynamicParagraphs = [
+        `Comunicado formal de **Gestão de Crise** — sistema **${cleanSystemName}**.`,
+        crisisIncidentNumber ? `**Nº do Incidente:** ${crisisIncidentNumber}` : null,
+        crisisAffectedUnits ? `**Unidades Afetadas:** ${crisisAffectedUnits}` : null,
+        crisisCause ? `**Causa:** ${crisisCause}` : null,
+        crisisTechnicalResponsible ? `**Responsável Técnico:** ${crisisTechnicalResponsible}` : null,
+        crisisCommandResponsible ? `**Responsável Command:** ${crisisCommandResponsible}` : null,
+        crisisTimeIncident ? `**Horário do Incidente:** ${crisisTimeIncident}` : null,
+        crisisTimeActivation ? `**Horário de Acionamento:** ${crisisTimeActivation}` : null,
+        crisisTimeClosure ? `**Horário de Encerramento:** ${crisisTimeClosure}` : null,
+        crisisRoomLink ? `**Sala de Crise:** ${crisisRoomLink}` : null,
+        ...crisisUpdateRows.map(r => `**${r.hora}:** ${r.texto}`)
+      ].filter(Boolean);
+    }
+
+    return (
+      <div
+        style={{
+          width: "420px",
+          height: `${scaledHeight}px`,
+          position: "relative",
+          overflow: "hidden",
+          borderRadius: "24px",
+          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.45)",
+          alignSelf: "flex-start",
+          flexShrink: 0
+        }}
+      >
+        <div
+          style={{
+            transform: `scale(${scaleFactor})`,
+            transformOrigin: "top left",
+            width: "662px",
+            height: "1181px"
+          }}
+        >
+          <DpspCard662x1181
+            canvasRef={canvasRef}
+            date={flashDate || "20/08"}
+            headerTag={headerTag || (generatorMode === "loja" ? "OPERAÇÃO DE LOJAS" : generatorMode === "cds" ? "CENTROS DE DISTRIBUIÇÃO" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO" : generatorMode === "crise" ? "GESTÃO DE CRISE" : "MANUTENÇÃO PROGRAMADA")}
+            system={cleanSystemName}
+            day="XX/XX (dia da semana)"
+            start="XXh"
+            endDate="XX/XX (dia da semana)"
+            end="XXh"
+            impact={maintenanceImpact || executiveImpact || "XXXXX"}
+            phone={contactPhone}
+            type={type}
+            closingText={closingText}
+            signature={signature}
+            paragraphs={dynamicParagraphs}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // LAYOUT PATTERN 2: CLASSIC (Modelo Anterior Compacto)
+  // ---------------------------------------------------------------------------
   return (
     <div
       ref={canvasRef}
@@ -380,294 +841,8 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
           <div style={{ marginTop: "4px", color: "#1e293b" }}>{title}</div>
         </h2>
 
-        {/* MODE 1: LOJA BODY */}
-        {generatorMode === "loja" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#f8fafc", padding: "12px", borderRadius: "8px", borderLeft: `4px solid ${styleConfig.bg}` }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>📍 LOJAS AFETADAS / REGIONAL</span>
-              <strong style={{ fontSize: "0.9rem", color: "#0f172a" }}>{affectedStores}</strong>
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-
-            {storeActionGuide && (
-              <div style={{ backgroundColor: "#fffbe6", padding: "12px", borderRadius: "8px", border: "1px solid #fef08a", color: "#854d0e", fontSize: "0.82rem" }}>
-                <strong style={{ display: "block", color: "#a16207", marginBottom: "2px" }}>⚠️ ORIENTAÇÃO PARA A FRENTE DE LOJA:</strong>
-                {storeActionGuide}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* MODE 2: CDS BODY */}
-        {generatorMode === "cds" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>UNIDADES IMPACTADAS</span>
-                <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>
-                  {Array.isArray(affectedCDs) ? affectedCDs.join(", ") : affectedCDs}
-                </strong>
-              </div>
-              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>PROCESSO LOGÍSTICO</span>
-                <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{cdProcess}</strong>
-              </div>
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* MODE 3: EXECUTIVO BODY */}
-        {generatorMode === "executivo" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", fontSize: "0.85rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#f1f5f9", padding: "12px", borderRadius: "8px", borderTop: "1px solid #cbd5e1", borderRight: "1px solid #cbd5e1", borderBottom: "1px solid #cbd5e1", borderLeft: `4px solid ${styleConfig.bg}` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#475569", textTransform: "uppercase" }}>IMPACTO DE NEGÓCIO</span>
-                <span style={{ fontSize: "0.7rem", fontWeight: 800, color: styleConfig.bg }}>ETA: {executiveEta}</span>
-              </div>
-              <strong style={{ fontSize: "0.88rem", color: "#0f172a" }}>{executiveImpact}</strong>
-            </div>
-
-            <div style={{ backgroundColor: "#fafafa", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>CAUSA RAIZ & DIAGNÓSTICO</span>
-              <p style={{ margin: 0, fontSize: "0.82rem", color: "#334155" }}>{executiveRootCause}</p>
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* MODE 4: MANUTENÇÃO BODY — janela programada vs. conclusão (normalizada) */}
-        {generatorMode === "manutencao" && type !== "normalizacao" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#eff6ff", padding: "12px", borderRadius: "8px", borderTop: "1px solid #bfdbfe", borderRight: "1px solid #bfdbfe", borderBottom: "1px solid #bfdbfe", borderLeft: `4px solid ${styleConfig.bg}`, textAlign: "center" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#1d4ed8", textTransform: "uppercase", display: "block" }}>🗓️ JANELA DA MANUTENÇÃO PROGRAMADA</span>
-              <strong style={{ fontSize: "0.95rem", color: "#1e40af" }}>{maintenanceWindow}</strong>
-            </div>
-
-            <div style={{ backgroundColor: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#475569", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>IMPACTO PREVISTO DURANTE A JANELA</span>
-              <p style={{ margin: 0, fontSize: "0.83rem", color: "#1e293b" }}>{maintenanceImpact}</p>
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {generatorMode === "manutencao" && type === "normalizacao" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#dcfce7", padding: "12px", borderRadius: "8px", border: "1px solid #86efac", textAlign: "center" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#15803d", textTransform: "uppercase", display: "block" }}>✅ CONCLUSÃO DE MANUTENÇÃO PROGRAMADA</span>
-              <strong style={{ fontSize: "0.95rem", color: "#14532d" }}>{maintenanceWindow}</strong>
-            </div>
-
-            <p style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-              {renderFormattedText(maintenanceClosing)}
-            </p>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* MODE 5: FLASH DE VENDAS — checklist fixo de plantão por horário */}
-        {generatorMode === "flash" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#ecfeff", padding: "10px", borderRadius: "8px", border: "1px solid #a5f3fc", textAlign: "center" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#0891b2", textTransform: "uppercase", display: "block" }}>📅 DATA DO PLANTÃO</span>
-              <strong style={{ fontSize: "0.95rem", color: "#0e7490" }}>{flashDate}</strong>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-              {(flashSlots && flashSlots.length > 0 ? flashSlots : [
-                { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
-                { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
-                { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
-                { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
-              ]).map((slot, idx) => {
-                const st = (slot.status || "").trim();
-                const isOk = /^ok/i.test(st) || st === "✅" || /^conclu/i.test(st);
-                const isPending = /^pend/i.test(st) || /^atras/i.test(st) || st === "🔴";
-                const isWarning = /^acomp/i.test(st) || /^em /i.test(st) || st === "🟡";
-
-                return (
-                  <div key={idx} style={{ 
-                    backgroundColor: isOk ? "#f0fdf4" : isPending ? "#fef2f2" : isWarning ? "#fffbeb" : "#f8fafc", 
-                    border: isOk ? "1px solid #bbf7d0" : isPending ? "1px solid #fecaca" : isWarning ? "1px solid #fef08a" : "1px solid #e2e8f0", 
-                    borderRadius: "6px", 
-                    padding: "5px 8px", 
-                    display: "flex", 
-                    alignItems: "center", 
-                    justifyContent: "space-between", 
-                    fontSize: "0.72rem" 
-                  }}>
-                    <span style={{ fontWeight: 700, color: "#0891b2" }}>{slot.hora}</span>
-                    <span style={{ 
-                      fontWeight: st ? 800 : 400, 
-                      color: isOk ? "#16a34a" : isPending ? "#dc2626" : isWarning ? "#d97706" : "#94a3b8" 
-                    }}>
-                      {st || "—"}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* MODE 6: MALHA OPERACIONAL — tabela dinâmica horário -> status */}
-        {generatorMode === "malha" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {malhaRows.map((row, idx) => {
-                const isFinal = /finaliz/i.test(row.status || "");
-                return (
-                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <span style={{ backgroundColor: styleConfig.bg, color: "#fff", fontWeight: 800, fontSize: "0.78rem", padding: "4px 10px", borderRadius: "6px", minWidth: "56px", textAlign: "center" }}>
-                      {row.hora}
-                    </span>
-                    <span style={{ fontSize: "0.82rem", fontWeight: isFinal ? 800 : 500, color: isFinal ? "#15803d" : "#334155" }}>
-                      {row.status}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* MODE 7: MALHA LOJAS — contador + checklist com status ✅/⌛ */}
-        {generatorMode === "malha-lojas" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "left", fontSize: "0.88rem", color: "#334155" }}>
-            <div style={{ backgroundColor: "#f0fdf4", padding: "12px", borderRadius: "8px", border: "1px solid #bbf7d0", textAlign: "center" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#15803d", textTransform: "uppercase", display: "block" }}>🏬 LOJAS NA MALHA</span>
-              <strong style={{ fontSize: "1.4rem", color: "#14532d" }}>{malhaLojasCount}</strong>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {malhaLojasChecklist.map((item, idx) => (
-                <div key={idx} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a" }}>{item.label}</span>
-                  <span style={{ fontSize: "1rem" }}>{item.done ? "✅" : "⌛"}</span>
-                </div>
-              ))}
-            </div>
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* MODE 8: GESTÃO DE CRISE — campos formais de abertura/encerramento + linha do tempo de atualizações */}
-        {generatorMode === "crise" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", textAlign: "left", fontSize: "0.85rem", color: "#334155" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
-                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>Nº DO INCIDENTE</span>
-                <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{crisisIncidentNumber || "—"}</strong>
-              </div>
-              <div style={{ backgroundColor: "#f8fafc", padding: "10px", borderRadius: "8px", borderTop: "1px solid #e2e8f0", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0", borderLeft: `3px solid ${styleConfig.bg}` }}>
-                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: styleConfig.bg, textTransform: "uppercase", display: "block" }}>UNIDADES AFETADAS</span>
-                <strong style={{ fontSize: "0.82rem", color: "#0f172a" }}>{crisisAffectedUnits || "—"}</strong>
-              </div>
-            </div>
-
-            {crisisCause && (
-              <div style={{ backgroundColor: "#fafafa", padding: "10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block", marginBottom: "2px" }}>CAUSA</span>
-                <p style={{ margin: 0, fontSize: "0.8rem", color: "#334155" }}>{crisisCause}</p>
-              </div>
-            )}
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div style={{ fontSize: "0.78rem" }}>
-                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>RESP. TÉCNICO</span>
-                <strong style={{ color: "#0f172a" }}>{crisisTechnicalResponsible || "—"}</strong>
-              </div>
-              <div style={{ fontSize: "0.78rem" }}>
-                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>RESP. COMMAND</span>
-                <strong style={{ color: "#0f172a" }}>{crisisCommandResponsible || "—"}</strong>
-              </div>
-            </div>
-
-            {crisisRoomLink && (
-              <div style={{ fontSize: "0.78rem", color: styleConfig.bg, fontWeight: 700, wordBreak: "break-all" }}>
-                🔗 Sala de Crise: {crisisRoomLink}
-              </div>
-            )}
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px" }}>
-              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Incidente</span>
-                <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeIncident || "—"}</strong>
-              </div>
-              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Acionamento</span>
-                <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeActivation || "—"}</strong>
-              </div>
-              <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "6px", textAlign: "center" }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase", display: "block" }}>Encerramento</span>
-                <strong style={{ fontSize: "0.78rem", color: "#0f172a" }}>{crisisTimeClosure || "—"}</strong>
-              </div>
-            </div>
-
-            {crisisUpdateRows.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#64748b", textTransform: "uppercase" }}>LINHA DO TEMPO</span>
-                {crisisUpdateRows.map((row, idx) => (
-                  <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "8px" }}>
-                    <span style={{ backgroundColor: styleConfig.bg, color: "#fff", fontWeight: 800, fontSize: "0.74rem", padding: "3px 8px", borderRadius: "6px", minWidth: "50px", textAlign: "center", flexShrink: 0 }}>
-                      {row.hora}
-                    </span>
-                    <span style={{ fontSize: "0.8rem", color: "#334155", lineHeight: 1.4 }}>{row.texto}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {paragraphs.map((p, idx) => (
-              <p key={idx} style={{ margin: 0, lineHeight: 1.45, textAlign: "center" }}>
-                {renderFormattedText(p)}
-              </p>
-            ))}
-          </div>
-        )}
+        {/* Render Mode Body */}
+        {renderCardBody()}
 
         {/* Closing & Signature */}
         <div style={{ marginTop: "16px", textAlign: "center" }}>

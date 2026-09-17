@@ -1,0 +1,328 @@
+/* ========================================
+   MANUTENÇÃO PROGRAMADA — CARD COMPONENT CSS
+======================================== */
+
+.notice {
+  position: relative;
+  width: 430px;
+  min-height: 760px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+  font-family: 'Nunito', 'Inter', Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #f4f4f4 0%, #eeeeee 45%, #e4e4e4 100%);
+  color: #111;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   ELEMENTOS DECORATIVOS DO FUNDO
+======================================== */
+
+.background-shape {
+  position: absolute;
+  pointer-events: none;
+  opacity: .55;
+  z-index: 0;
+}
+
+.shape-red {
+  width: 38px;
+  height: 650px;
+  background: #e96d7b;
+  transform: rotate(31deg);
+}
+
+.shape-blue {
+  width: 30px;
+  height: 700px;
+  background: #91cbe9;
+  transform: rotate(31deg);
+}
+
+.shape-gray {
+  width: 80px;
+  height: 900px;
+  background: rgba(255, 255, 255, .35);
+  transform: rotate(31deg);
+}
+
+.red-1 {
+  top: -180px;
+  left: 40px;
+}
+
+.red-2 {
+  top: -120px;
+  right: 60px;
+  transform: rotate(15deg);
+}
+
+.blue-1 {
+  top: -80px;
+  left: 180px;
+}
+
+.blue-2 {
+  top: 220px;
+  right: 20px;
+  transform: rotate(31deg);
+}
+
+.gray-1 {
+  top: 40px;
+  left: 150px;
+}
+
+/* ========================================
+   CABEÇALHO
+======================================== */
+
+.header-notice {
+  position: relative;
+  height: 250px;
+  z-index: 2;
+}
+
+/* círculo do logo */
+
+.logo-circle {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  width: 140px;
+  height: 195px;
+  border: 6px solid #182b50;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 6px #eee, 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.theme-red .logo-circle {
+  border-color: #e8505b;
+}
+
+.logo {
+  text-align: center;
+  color: #303547;
+  line-height: .9;
+}
+
+.logo span {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+}
+
+.logo strong {
+  display: block;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+/* ========================================
+   TÍTULO
+======================================== */
+
+.header-title {
+  position: absolute;
+  top: 85px;
+  left: 145px;
+  width: 265px;
+  z-index: 3;
+}
+
+.main-title {
+  height: 68px;
+  border-radius: 0 45px 45px 0;
+  background: #2b2734;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.25rem;
+  line-height: 1.15;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+}
+
+.subtitle {
+  margin-top: 2px;
+  height: 34px;
+  border-radius: 0 35px 35px 0;
+  background: #2b2734;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.theme-red .subtitle {
+  background: #e8505b;
+}
+
+/* ========================================
+   DATA
+======================================== */
+
+.date-badge {
+  position: absolute;
+  left: 65px;
+  top: 215px;
+  width: 65px;
+  height: 38px;
+  background: #2b3045;
+  color: white;
+  border-radius: 0 0 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 900;
+  z-index: 5;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+}
+
+.theme-red .date-badge {
+  background: #e8505b;
+}
+
+/* ========================================
+   CONTEÚDO
+======================================== */
+
+.content-notice {
+  position: relative;
+  z-index: 3;
+  margin: 0 30px;
+  min-height: 440px;
+  border: 2px solid rgba(70,70,70,.45);
+  border-radius: 20px;
+  padding: 16px 16px 24px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flexDirection: column;
+}
+
+.content-notice h1 {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.small-divider {
+  width: 64px;
+  height: 16px;
+  margin: 0 auto 15px auto;
+  background: #2b3045;
+  border-radius: 10px;
+}
+
+.theme-red .small-divider {
+  background: #e8505b;
+}
+
+/* ========================================
+   TEXTO
+======================================== */
+
+.text-notice {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: #334155;
+}
+
+.text-notice p {
+  margin: 0 0 14px;
+}
+
+.text-notice strong {
+  font-weight: 800;
+}
+
+.details {
+  margin-top: 16px !important;
+}
+
+/* ========================================
+   AGRADECIMENTO
+======================================== */
+
+.thanks {
+  position: relative;
+  margin-top: auto;
+  padding-top: 14px;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #334155;
+}
+
+.thanks strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+/* pequeno elemento decorativo */
+
+.thanks::after {
+  content: "";
+  position: absolute;
+  width: 64px;
+  height: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -32px;
+  background: #2b3045;
+  border-radius: 10px;
+}
+
+.theme-red .thanks::after {
+  background: #e8505b;
+}
+
+/* ========================================
+   RODAPÉ
+======================================== */
+
+.footer-notice {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  min-height: 54px;
+  padding: 10px 16px;
+  background: #2b3045;
+  color: white;
+  border-radius: 18px 18px 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+}
+
+.theme-red .footer-notice {
+  background: #e8505b;
+}
+
+.footer-notice strong {
+  font-weight: 900;
+}

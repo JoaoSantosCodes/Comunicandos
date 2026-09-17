@@ -44,6 +44,7 @@ export const CardGeneratorView = () => {
 
   const [formData, setFormData] = useState({
     generatorMode: "cds",
+    layoutPattern: "pptx_2026", // 'pptx_2026' (Novo Padrão Oficial 2026) or 'classic'
     type: "atualizacao",
     headerTag: "ATUALIZAÇÃO LOGÍSTICA!",
     title: "INTEGRAÇÃO PEOPLESOFT E EWM",
@@ -100,7 +101,7 @@ export const CardGeneratorView = () => {
     crisisUpdateRows: [
       { hora: "14:00", texto: "Incidente identificado e equipe técnica acionada." }
     ],
-    closingText: "Agradecemos a compreensão.",
+    closingText: "Agradecemos a compreensão,",
     signature: "CENTRAL DE COMANDO",
     contactPhone: "(11) 5529-6003",
     // Paletas de Cores & Customizador
@@ -128,7 +129,7 @@ export const CardGeneratorView = () => {
     if (activeCardDraft.paragraphs) {
       // Card já publicado (edição via tela de Comunicações): mesmo formato do formData.
       setGeneratorMode(activeCardDraft.generatorMode || "cds");
-      setFormData(prev => ({ ...prev, ...activeCardDraft }));
+      setFormData(prev => ({ ...prev, layoutPattern: "pptx_2026", ...activeCardDraft }));
     } else {
       // Rascunho rápido gerado a partir de um incidente (Dashboard / Sala de Crise).
       const scopeText = Array.isArray(activeCardDraft.scope)
@@ -139,6 +140,7 @@ export const CardGeneratorView = () => {
       setFormData(prev => ({
         ...prev,
         generatorMode: "cds",
+        layoutPattern: "pptx_2026",
         type: activeCardDraft.type || prev.type,
         title: activeCardDraft.title || prev.title,
         cdProcess: activeCardDraft.process || prev.cdProcess,
@@ -177,31 +179,31 @@ export const CardGeneratorView = () => {
         "A **Central de Comando** segue acompanhando o incidente e atualizará os CDs assim que houver novidades."
       ];
     } else if (newMode === "executivo") {
-      newHeader = "BRIEFING EXECUTIVO DE INCIDENTE";
-      newTitle = "SISTEMA SAP - INDISPONIBILIDADE DE PEDIDOS";
+      newHeader = "INFORMAÇÃO IMPORTANTE!";
+      newTitle = "FATURAMENTO DE PEDIDOS E-COMMERCE";
       newParagraphs = [
-        "Incidente de **Severidade P1 (Crítica)** afetando o fluxo de faturamento logístico.",
-        "Ponte técnica de crise estabelecida com diretores da **SAP** e consultoria **Wipro**.",
-        "Próxima atualização executiva agendada para às 16h00."
+        "Foi disponibilizada uma correção no PDV para impedir o faturamento duplicado de **pedidos de e-commerce**.",
+        "A partir desta atualização, o sistema bloqueia automaticamente novas tentativas de faturamento de pedidos já processados, reduzindo o risco de duplicidades.",
+        "Em caso de problemas no resgate, conferência ou faturamento de pedidos de e-commerce, abra um chamado na categoria: **“Erro na Conferência ou Faturamento do Pedido”**"
       ];
     } else if (newMode === "manutencao") {
       newHeader = "MANUTENÇÃO PROGRAMADA";
-      newTitle = "UPGRADE NO BANCO DE DADOS ORACLE SAP";
+      newTitle = "SISTEMA: XXXXX";
       newParagraphs = [
-        "Comunicamos que será realizada manutenção preventiva programada na infraestrutura de banco de dados.",
-        "Pedimos a gentileza de encerrar todas as sessões ativas no **SAP ERP** até às 01h55.",
-        "Após o término da janela, os sistemas serão liberados automaticamente."
+        "Informamos que será realizada uma manutenção programada no(S) sistema(S) **XXXXX**.",
+        "A atividade tem como objetivo implementar melhorias e atualizações no serviço.",
+        "Não é necessária a abertura de chamados relacionados à indisponibilidade durante a janela de manutenção."
       ];
     } else if (newMode === "flash") {
       newHeader = "FLASH DE VENDAS";
-      newTitle = "CHECKLIST DE PLANTÃO — MALHA DE VENDAS";
+      newTitle = "SISTEMA: XXXXX";
       newParagraphs = [
-        "Acompanhamento do plantão de vendas ao longo do dia, com checkpoints programados.",
-        "Equipes devem confirmar o status da malha em cada horário previsto.",
-        "Central de Comando consolidando os retornos das regionais."
+        "A instabilidade no(S) sistema(S) **XXXXX** foi normalizada.",
+        "A Central de Comando segue monitorando o serviço para garantir sua estabilidade.",
+        "Caso seja identificada alguma ocorrência, solicitamos a abertura de chamado para atendimento pontual."
       ];
     } else if (newMode === "malha") {
-      newHeader = "MALHA DE PREÇOS OPERACIONAL";
+      newHeader = "MALHA OPERACIONAL";
       newTitle = "ACOMPANHAMENTO DA MALHA DE PREÇOS";
       newParagraphs = [
         "Processo de atualização de malha de preços em andamento nos Centros de Distribuição.",
@@ -218,7 +220,7 @@ export const CardGeneratorView = () => {
       ];
     } else if (newMode === "crise") {
       newHeader = "ALERTA DE GESTÃO DE CRISE";
-      newTitle = "ABERTURA FORMAL DE INCIDENTE CRÍTICO";
+      newTitle = "SISTEMA: XXXXX";
       newParagraphs = [
         "Incidente crítico identificado e formalmente registrado pela Central de Comando.",
         "Sala de crise acionada com responsáveis técnico e de Command designados.",
@@ -507,7 +509,7 @@ ${formData.closingText}
               GERADOR DE CARDS OPERACIONAIS DPSP
             </h2>
             <p style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>
-              Selecione o modo do card, use a biblioteca de frases prontas e personalize a paleta e logos.
+              Selecione o modo do card, use a biblioteca de frases prontas e personalize o layout oficial 2026.
             </p>
           </div>
 
@@ -659,6 +661,24 @@ ${formData.closingText}
             </span>
           </div>
 
+          {/* Model Visual Layout Selector (Padrão Oficial 2026 vs Clássico) */}
+          <div className="form-group" style={{ backgroundColor: "rgba(37, 99, 235, 0.08)", padding: "10px 12px", borderRadius: "10px", border: "1px solid rgba(37, 99, 235, 0.3)" }}>
+            <label className="form-label" style={{ fontWeight: 800, color: "var(--text-main)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+              🎨 Layout Visual do Card
+            </label>
+            <select
+              className="form-select"
+              value={formData.layoutPattern || "pptx_2026"}
+              onChange={(e) => setFormData({ ...formData, layoutPattern: e.target.value })}
+              style={{ fontWeight: 700, fontSize: "0.88rem" }}
+            >
+              <option value="pptx_2026">⭐ Novo Padrão Oficial 2026 (Central de Comando PPTX)</option>
+              <option value="svg_662">🎯 Padrão Vetorial Pixel-Perfect (SVG + React 662×1181px)</option>
+              <option value="pure_css">⚡ Padrão React + CSS Puro (Manutenção & Comunicados)</option>
+              <option value="classic">📱 Modelo Clássico (Compacto com Badge Flutuante)</option>
+            </select>
+          </div>
+
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
             <div className="form-group">
               <label className="form-label">Tipo / Cor do Alerta</label>
@@ -672,23 +692,32 @@ ${formData.closingText}
                     flash: "FLASH DE VENDAS", malha: "MALHA OPERACIONAL", "malha-lojas": "MALHA LOJAS", crise: "GESTÃO DE CRISE"
                   }[generatorMode] || "STATUS";
                   const tagMap = {
-                    indisponibilidade: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : generatorMode === "crise" ? "CRISE ABERTA — INDISPONIBILIDADE" : `INDISPONIBILIDADE — ${modeLabel}!`,
-                    atualizacao: generatorMode === "loja" ? "ATUALIZAÇÃO DE STATUS - LOJAS!" : generatorMode === "cds" ? "ATUALIZAÇÃO LOGÍSTICA!" : generatorMode === "executivo" ? "BRIEFING EXECUTIVO DE INCIDENTE" : generatorMode === "crise" ? "ATUALIZAÇÃO DE CRISE" : `ATUALIZAÇÃO — ${modeLabel}!`,
+                    indisponibilidade: generatorMode === "loja" ? "INDISPONIBILIDADE EM LOJAS!" : generatorMode === "cds" ? "INDISPONIBILIDADE EM CDs!" : generatorMode === "executivo" ? "BRIEFING DE CRISE - INDISPONIBILIDADE" : generatorMode === "crise" ? "CRISE ABERTA — INDISPONIBILIDADE" : "INSTABILIDADE IDENTIFICADA",
+                    atualizacao: generatorMode === "loja" ? "COMUNICADO PARA LOJAS!" : generatorMode === "cds" ? "COMUNICADO CENTROS DE DISTRIBUIÇÃO!" : generatorMode === "executivo" ? "INFORMAÇÃO IMPORTANTE!" : generatorMode === "crise" ? "ATUALIZAÇÃO DE CRISE" : "INFORMAÇÃO IMPORTANTE!",
                     normalizacao: generatorMode === "loja" ? "LOJAS NORMALIZADAS!" : generatorMode === "cds" ? "LOGÍSTICA NORMALIZADA!" : generatorMode === "executivo" ? "SERVIÇO EXECUTIVO NORMALIZADO!" : generatorMode === "manutencao" ? "MANUTENÇÃO CONCLUÍDA!" : generatorMode === "crise" ? "CRISE ENCERRADA — NORMALIZADO" : `${modeLabel} FINALIZADA!`,
-                    manutencao: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA CDs!" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : generatorMode === "crise" ? "CRISE — MANUTENÇÃO EMERGENCIAL" : "MANUTENÇÃO PROGRAMADA!"
+                    manutencao: generatorMode === "loja" ? "MANUTENÇÃO PROGRAMADA LOJAS!" : generatorMode === "cds" ? "MANUTENÇÃO PROGRAMADA CDs!" : generatorMode === "executivo" ? "INFORMATIVO EXECUTIVO!" : generatorMode === "crise" ? "CRISE — MANUTENÇÃO EMERGENCIAL" : "MANUTENÇÃO PROGRAMADA"
                   };
                   setFormData({
                     ...formData,
                     type: newType,
-                    headerTag: tagMap[newType] || "ATUALIZAÇÃO DE STATUS!"
+                    headerTag: tagMap[newType] || "INFORMAÇÃO IMPORTANTE!"
                   });
                 }}
               >
                 <option value="indisponibilidade">🔴 Indisponibilidade (Fundo Vermelho)</option>
-                <option value="atualizacao">🟡 Atualização (Fundo Amarelo / Amber)</option>
+                <option value="atualizacao">🟡 Atualização / Informativo (Fundo Amarelo / Azul)</option>
                 <option value="normalizacao">🟢 Normalização (Fundo Verde)</option>
                 <option value="manutencao">🔵 Manutenção (Fundo Azul)</option>
               </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Data do Card</label>
+              <input
+                type="text"
+                className="form-input"
+                value={formData.flashDate}
+                onChange={(e) => setFormData({ ...formData, flashDate: e.target.value })}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Telefone Service Desk</label>
