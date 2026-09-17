@@ -20,7 +20,9 @@ import {
   Settings,
   Radio,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  BookOpen,
+  ClipboardCheck
 } from "lucide-react";
 
 export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
@@ -38,7 +40,8 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
         { id: "incidents", label: "Incidentes", icon: AlertTriangle, badge: criticalCount ? `${criticalCount} P1` : null, badgeColor: "bg-red-500" },
         { id: "wizard", label: "Novo Incidente", icon: PlusCircle, isHighlight: true },
         { id: "timeline", label: "Timeline", icon: Clock },
-        { id: "crisis-room", label: "Sala de Crise", icon: Flame, isUrgent: criticalCount > 0 }
+        { id: "crisis-room", label: "Sala de Crise", icon: Flame, isUrgent: criticalCount > 0 },
+        { id: "shift-monitoring", label: "Monitoramento & Plantão", icon: ClipboardCheck, isNew: true }
       ]
     },
     {
@@ -52,6 +55,7 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
     {
       title: "RECURSOS & BASE KB",
       items: [
+        { id: "pops-kb", label: "Processos & POPs", icon: BookOpen, isNew: true },
         { id: "phrases", label: "Biblioteca Frases", icon: MessageSquare },
         { id: "templates", label: "Templates", icon: FileCode },
         { id: "history", label: "Histórico / KB", icon: Archive },
