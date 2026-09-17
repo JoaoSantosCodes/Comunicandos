@@ -30,6 +30,7 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
     maintenanceImpact = "Indisponibilidade temporária de acesso ao SAP ERP durante a janela.",
     maintenanceClosing = "Manutenção concluída com sucesso. Todos os sistemas foram validados e liberados.",
     flashDate = new Date().toLocaleDateString("pt-BR"),
+    flashSlots = [],
     malhaRows = [],
     malhaLojasCount = 0,
     malhaLojasChecklist = [],
@@ -499,12 +500,38 @@ export const InstitutionalCardCanvas = ({ cardData, canvasRef }) => {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-              {["00h15", "02h15", "04h15", "06h15", "08h15", "10h15", "12h15", "14h15", "16h15", "18h15", "20h15", "22h15"].map(slot => (
-                <div key={slot} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "6px", padding: "5px 8px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.72rem" }}>
-                  <span style={{ fontWeight: 700, color: "#0891b2" }}>{slot}</span>
-                  <span style={{ color: "#94a3b8" }}>—</span>
-                </div>
-              ))}
+              {(flashSlots && flashSlots.length > 0 ? flashSlots : [
+                { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
+                { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
+                { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
+                { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
+              ]).map((slot, idx) => {
+                const st = (slot.status || "").trim();
+                const isOk = /^ok/i.test(st) || st === "✅" || /^conclu/i.test(st);
+                const isPending = /^pend/i.test(st) || /^atras/i.test(st) || st === "🔴";
+                const isWarning = /^acomp/i.test(st) || /^em /i.test(st) || st === "🟡";
+
+                return (
+                  <div key={idx} style={{ 
+                    backgroundColor: isOk ? "#f0fdf4" : isPending ? "#fef2f2" : isWarning ? "#fffbeb" : "#f8fafc", 
+                    border: isOk ? "1px solid #bbf7d0" : isPending ? "1px solid #fecaca" : isWarning ? "1px solid #fef08a" : "1px solid #e2e8f0", 
+                    borderRadius: "6px", 
+                    padding: "5px 8px", 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "space-between", 
+                    fontSize: "0.72rem" 
+                  }}>
+                    <span style={{ fontWeight: 700, color: "#0891b2" }}>{slot.hora}</span>
+                    <span style={{ 
+                      fontWeight: st ? 800 : 400, 
+                      color: isOk ? "#16a34a" : isPending ? "#dc2626" : isWarning ? "#d97706" : "#94a3b8" 
+                    }}>
+                      {st || "—"}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
             {paragraphs.map((p, idx) => (

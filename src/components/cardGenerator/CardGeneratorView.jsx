@@ -61,8 +61,21 @@ export const CardGeneratorView = () => {
     executiveEta: "16:30 (Previsão de Solução)",
     maintenanceWindow: "16/09/2026 das 02:00h às 04:30h",
     maintenanceImpact: "Indisponibilidade temporária de acesso ao SAP ERP durante a janela programada.",
-    maintenanceClosing: "Manutenção concluída com sucesso. Todos os sistemas foram validados e liberados.",
     flashDate: new Date().toLocaleDateString("pt-BR"),
+    flashSlots: [
+      { hora: "00h15", status: "OK" },
+      { hora: "02h15", status: "OK" },
+      { hora: "04h15", status: "OK" },
+      { hora: "06h15", status: "OK" },
+      { hora: "08h15", status: "OK" },
+      { hora: "10h15", status: "OK" },
+      { hora: "12h15", status: "" },
+      { hora: "14h15", status: "" },
+      { hora: "16h15", status: "" },
+      { hora: "18h15", status: "" },
+      { hora: "20h15", status: "" },
+      { hora: "22h15", status: "" }
+    ],
     malhaRows: [
       { hora: "08:00", status: "18 lojas restantes" },
       { hora: "10:00", status: "09 lojas restantes" },
@@ -256,6 +269,37 @@ export const CardGeneratorView = () => {
 
   const handleClearImages = () => {
     setFormData(prev => ({ ...prev, leftLogoImage: null, rightLogoImage: null, fullFooterImage: null }));
+  };
+
+  const handleFlashSlotChange = (idx, value) => {
+    setFormData(prev => {
+      const currentSlots = prev.flashSlots || [
+        { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
+        { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
+        { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
+        { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
+      ];
+      const updated = [...currentSlots];
+      updated[idx] = { ...updated[idx], status: value };
+      return { ...prev, flashSlots: updated };
+    });
+  };
+
+  const handleFlashQuickAction = (action) => {
+    setFormData(prev => {
+      const currentSlots = prev.flashSlots || [
+        { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
+        { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
+        { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
+        { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
+      ];
+      const updated = currentSlots.map(slot => {
+        if (action === "all_ok") return { ...slot, status: "OK" };
+        if (action === "clear") return { ...slot, status: "" };
+        return slot;
+      });
+      return { ...prev, flashSlots: updated };
+    });
   };
 
   const handleAddMalhaRow = () => {
@@ -788,15 +832,81 @@ ${formData.closingText}
 
           {/* FLASH DE VENDAS */}
           {generatorMode === "flash" && (
-            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "12px", borderRadius: "12px", border: "1px solid #0891b2" }}>
+            <div style={{ backgroundColor: "var(--bg-dark-hover)", padding: "14px", borderRadius: "12px", border: "1px solid #0891b2", display: "flex", flexDirection: "column", gap: "12px" }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ color: "#0891b2" }}>Data do Plantão</label>
+                <label className="form-label" style={{ color: "#0891b2", fontWeight: 700 }}>📅 Data do Plantão</label>
                 <input
                   type="text"
                   className="form-input"
                   value={formData.flashDate}
                   onChange={(e) => setFormData({ ...formData, flashDate: e.target.value })}
                 />
+              </div>
+
+              <div style={{ borderTop: "1px solid var(--border-color)", paddingTop: "10px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                  <label className="form-label" style={{ color: "#0891b2", fontWeight: 700, margin: 0 }}>
+                    🕒 Checkpoints de Horário do Flash
+                  </label>
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      onClick={() => handleFlashQuickAction("all_ok")}
+                      style={{ fontSize: "0.7rem", padding: "2px 8px", backgroundColor: "#0891b2", color: "#fff", border: "none" }}
+                    >
+                      Todos OK ✅
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      onClick={() => handleFlashQuickAction("clear")}
+                      style={{ fontSize: "0.7rem", padding: "2px 8px", backgroundColor: "var(--chrome-2)", border: "1px solid var(--border-color)", color: "var(--text-main)" }}
+                    >
+                      Limpar ✕
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", maxHeight: "280px", overflowY: "auto", paddingRight: "4px" }}>
+                  {(formData.flashSlots || [
+                    { hora: "00h15", status: "" }, { hora: "02h15", status: "" }, { hora: "04h15", status: "" },
+                    { hora: "06h15", status: "" }, { hora: "08h15", status: "" }, { hora: "10h15", status: "" },
+                    { hora: "12h15", status: "" }, { hora: "14h15", status: "" }, { hora: "16h15", status: "" },
+                    { hora: "18h15", status: "" }, { hora: "20h15", status: "" }, { hora: "22h15", status: "" }
+                  ]).map((slot, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: "6px", backgroundColor: "var(--chrome)", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border-color)" }}>
+                      <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#0891b2", minWidth: "44px" }}>
+                        {slot.hora}
+                      </span>
+                      <input
+                        type="text"
+                        className="form-input"
+                        style={{ height: "28px", fontSize: "0.75rem", padding: "2px 6px" }}
+                        placeholder="Ex: OK, Pendente..."
+                        value={slot.status || ""}
+                        onChange={(e) => handleFlashSlotChange(idx, e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleFlashSlotChange(idx, slot.status === "OK" ? "" : "OK")}
+                        style={{
+                          backgroundColor: slot.status === "OK" ? "#10b981" : "rgba(255,255,255,0.1)",
+                          color: slot.status === "OK" ? "#fff" : "rgba(255,255,255,0.5)",
+                          border: "none",
+                          borderRadius: "4px",
+                          padding: "3px 6px",
+                          fontSize: "0.7rem",
+                          cursor: "pointer",
+                          fontWeight: 700
+                        }}
+                        title="Alternar OK"
+                      >
+                        OK
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
