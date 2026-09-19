@@ -86,7 +86,7 @@ export const IncidentWizardModal = () => {
         <form onSubmit={handleSubmit}>
           {/* STEP 1: IDENTIFICAÇÃO */}
           {step === 1 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div key="step1" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div className="form-group">
                 <label className="form-label">Sistema Atingido</label>
                 <select
@@ -159,7 +159,7 @@ export const IncidentWizardModal = () => {
 
           {/* STEP 2: IMPACTO & SCOPE */}
           {step === 2 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div key="step2" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div className="form-group">
                 <label className="form-label">Severidade Operacional</label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
@@ -244,7 +244,7 @@ export const IncidentWizardModal = () => {
 
           {/* STEP 3: EQUIPES */}
           {step === 3 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div key="step3" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div className="form-group">
                 <label className="form-label">Equipes Acionadas para Tratativa</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -333,7 +333,7 @@ export const IncidentWizardModal = () => {
 
           {/* STEP 4: REVISÃO & CONFIRMAÇÃO */}
           {step === 4 && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div key="step4" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div style={{ backgroundColor: "var(--bg-dark-hover)", border: "1px solid var(--border-color)", padding: "16px", borderRadius: "12px" }}>
                 <h4 style={{ color: "#2f6ea8", fontWeight: 700, fontSize: "0.95rem" }}>
                   {formData.system} — {formData.title}

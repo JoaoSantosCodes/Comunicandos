@@ -115,11 +115,11 @@ export const StoreLookupModal = ({ isOpen, onClose, onSelectStore }) => {
       }}
       className="animate-fade-in"
     >
-      <div 
-        className="panel-card" 
-        style={{ 
-          width: "100%", 
-          maxWidth: "1320px", 
+      <div
+        className="panel-card animate-modal-pop"
+        style={{
+          width: "100%",
+          maxWidth: "1320px",
           maxHeight: "94vh", 
           display: "flex", 
           flexDirection: "column",

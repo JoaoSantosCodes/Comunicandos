@@ -18,7 +18,7 @@ export const NormalizeIncidentModal = ({ incident, onCancel, onConfirm }) => {
       className="animate-fade-in"
       style={{ position: "fixed", inset: 0, backgroundColor: "rgba(32,30,29,0.55)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200, padding: "20px" }}
     >
-      <div className="panel-card" style={{ width: "100%", maxWidth: "480px" }}>
+      <div className="panel-card animate-modal-pop" style={{ width: "100%", maxWidth: "480px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
           <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "8px" }}>
             <CheckCircle2 size={18} style={{ color: "#10b981" }} />

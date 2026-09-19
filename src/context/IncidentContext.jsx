@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { INITIAL_INCIDENTS, SYSTEM_CATALOG, PHRASE_LIBRARY, CARD_TEMPLATES, TEAMS_LIST } from "../data/mockData";
 import { NormalizeIncidentModal } from "../components/incidents/NormalizeIncidentModal";
 import { IncidentContext } from "./incidentContextInstance";
@@ -81,6 +81,8 @@ export const IncidentProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCardDraft, setActiveCardDraft] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+  const [toastLeaving, setToastLeaving] = useState(false);
+  const toastTimersRef = useRef({ leave: null, remove: null });
 
   const [auditLogs, setAuditLogs] = useState(() => {
     const saved = localStorage.getItem("comando_audit_logs");
@@ -104,8 +106,20 @@ export const IncidentProvider = ({ children }) => {
   }, [auditLogs]);
 
   const showToast = (msg, type = "success") => {
+    clearTimeout(toastTimersRef.current.leave);
+    clearTimeout(toastTimersRef.current.remove);
+    setToastLeaving(false);
     setToastMessage({ id: Date.now(), msg, type });
-    setTimeout(() => setToastMessage(null), 3500);
+    // Anima a saída (fade + slide) antes de desmontar, em vez de sumir abruptamente.
+    toastTimersRef.current.leave = setTimeout(() => setToastLeaving(true), 3250);
+    toastTimersRef.current.remove = setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const dismissToast = () => {
+    clearTimeout(toastTimersRef.current.leave);
+    clearTimeout(toastTimersRef.current.remove);
+    setToastLeaving(true);
+    toastTimersRef.current.remove = setTimeout(() => setToastMessage(null), 220);
   };
 
   const addAuditLog = (action, target, detail) => {
@@ -435,7 +449,9 @@ export const IncidentProvider = ({ children }) => {
             fontSize: "0.9rem",
             fontWeight: 600,
             fontFamily: "var(--font-sans)",
-            animation: "fadeIn 0.25s ease-out"
+            opacity: toastLeaving ? 0 : 1,
+            transform: toastLeaving ? "translateY(10px) scale(0.96)" : "translateY(0) scale(1)",
+            transition: "opacity 0.22s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)"
           }}
         >
           <span
@@ -449,7 +465,7 @@ export const IncidentProvider = ({ children }) => {
           ></span>
           <span>{toastMessage.msg}</span>
           <button
-            onClick={() => setToastMessage(null)}
+            onClick={dismissToast}
             style={{ background: "none", border: "none", color: "rgba(245,234,216,0.55)", cursor: "pointer", marginLeft: "12px", padding: "2px" }}
           >
             ✕
