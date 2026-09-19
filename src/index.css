@@ -308,6 +308,11 @@ h1, h2, h3, .heading {
   to { transform: rotate(360deg); }
 }
 
+@keyframes sidebarPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.72; transform: scale(1.08); }
+}
+
 /* Mobile Hamburger Button (Hidden on Desktop) */
 .mobile-menu-btn {
   display: none;
