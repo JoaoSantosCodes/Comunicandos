@@ -143,18 +143,22 @@ export const CommandHubView = () => {
                 borderRadius: "8px 8px 0 0",
                 border: "none",
                 backgroundColor: isActive ? "rgba(200, 55, 45, 0.15)" : "transparent",
-                color: isActive ? "#f2867d" : "var(--text-muted)",
+                color: isActive ? "var(--accent-red)" : "var(--text-muted)",
                 fontWeight: isActive ? 700 : 500,
                 fontSize: "0.85rem",
                 cursor: "pointer",
                 borderBottom: isActive ? "2px solid #e2574c" : "2px solid transparent",
-                whiteSpace: "nowrap"
+                whiteSpace: "nowrap",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: isActive ? "translateY(-1px)" : "translateY(0)"
               }}
+              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = "var(--bg-dark-hover)"; }}
+              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = "transparent"; }}
             >
               <Icon size={16} />
               <span>{tb.label}</span>
               {tb.count !== undefined && (
-                <span style={{ fontSize: "0.7rem", backgroundColor: isActive ? "#e2574c" : "var(--bg-dark-hover)", color: isActive ? "#fff" : "var(--text-muted)", padding: "1px 6px", borderRadius: "99px", fontWeight: 700 }}>
+                <span style={{ fontSize: "0.7rem", backgroundColor: isActive ? "#e2574c" : "var(--bg-dark-hover)", color: isActive ? "#fff" : "var(--text-muted)", padding: "1px 6px", borderRadius: "99px", fontWeight: 700, transition: "all 0.2s ease" }}>
                   {tb.count}
                 </span>
               )}
@@ -165,7 +169,7 @@ export const CommandHubView = () => {
 
       {/* TAB 1: TELAS 1 A 14 */}
       {activeTab === "telas" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div key="telas" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {/* Search bar */}
           <div style={{ position: "relative", maxWidth: "500px" }}>
             <Search size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-dim)" }} />
@@ -181,8 +185,8 @@ export const CommandHubView = () => {
 
           {/* Grid of Telas 1 to 14 */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "18px" }}>
-            {filteredTelas.map(t => (
-              <div key={t.id} className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px", border: "1px solid var(--border-color)", padding: "18px" }}>
+            {filteredTelas.map((t, idx) => (
+              <div key={t.id} className="panel-card hoverable animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "14px", border: "1px solid var(--border-color)", padding: "18px", animationDelay: `${Math.min(idx * 0.04, 0.4)}s`, animationFillMode: "backwards" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                     <span style={{ fontFamily: "monospace", fontSize: "0.8rem", fontWeight: 800, backgroundColor: "#e2574c", color: "#fff", padding: "3px 8px", borderRadius: "6px" }}>
@@ -233,7 +237,12 @@ export const CommandHubView = () => {
                 {/* Tags */}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", paddingTop: "8px", borderTop: "1px dashed var(--border-color)" }}>
                   {t.tags.map(tg => (
-                    <span key={tg} style={{ fontSize: "0.68rem", color: "var(--text-muted)", backgroundColor: "var(--bg-dark-hover)", padding: "2px 6px", borderRadius: "4px" }}>
+                    <span
+                      key={tg}
+                      style={{ fontSize: "0.68rem", color: "var(--text-muted)", backgroundColor: "var(--bg-dark-hover)", padding: "2px 6px", borderRadius: "4px", transition: "all 0.15s ease", cursor: "default" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(200, 55, 45, 0.12)"; e.currentTarget.style.color = "var(--accent-red)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "var(--bg-dark-hover)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+                    >
                       #{tg}
                     </span>
                   ))}
@@ -246,7 +255,7 @@ export const CommandHubView = () => {
 
       {/* TAB 2: PORTAIS OPERADORAS & SHAREPOINT */}
       {activeTab === "portais" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div key="portais" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           
           {/* Section 1: Portais das Operadoras */}
           <div>
@@ -256,7 +265,7 @@ export const CommandHubView = () => {
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
               {OPERADORAS_PORTAIS.map((op, idx) => (
-                <div key={idx} className="panel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "12px", padding: "16px" }}>
+                <div key={idx} className="panel-card hoverable animate-fade-in" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "12px", padding: "16px", animationDelay: `${Math.min(idx * 0.04, 0.4)}s`, animationFillMode: "backwards" }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
                       <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#10b981", backgroundColor: "rgba(16, 185, 129, 0.12)", padding: "2px 8px", borderRadius: "4px" }}>
@@ -284,7 +293,7 @@ export const CommandHubView = () => {
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
               {SHAREPOINT_PLANILHAS.map((sp, idx) => (
-                <div key={idx} className="panel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "12px", padding: "16px" }}>
+                <div key={idx} className="panel-card hoverable animate-fade-in" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "12px", padding: "16px", animationDelay: `${Math.min(idx * 0.04, 0.4)}s`, animationFillMode: "backwards" }}>
                   <div>
                     <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#387fef", backgroundColor: "rgba(56, 127, 239, 0.12)", padding: "2px 8px", borderRadius: "4px", display: "inline-block", marginBottom: "6px" }}>
                       {sp.category}
@@ -309,7 +318,7 @@ export const CommandHubView = () => {
             </h3>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
               {LINKS_EXTRAS.map((ex, idx) => (
-                <div key={idx} className="panel-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "12px", padding: "16px" }}>
+                <div key={idx} className="panel-card hoverable animate-fade-in" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "12px", padding: "16px", animationDelay: `${Math.min(idx * 0.04, 0.4)}s`, animationFillMode: "backwards" }}>
                   <div>
                     <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#8b5cf6", backgroundColor: "rgba(139, 92, 246, 0.12)", padding: "2px 8px", borderRadius: "4px", display: "inline-block", marginBottom: "6px" }}>
                       {ex.category}
@@ -331,7 +340,7 @@ export const CommandHubView = () => {
 
       {/* TAB 3: BIBLIOTECA SQL */}
       {activeTab === "sql" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+        <div key="sql" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
             <div style={{ position: "relative", minWidth: "300px", flex: 1 }}>
               <Search size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "var(--text-dim)" }} />
@@ -350,8 +359,8 @@ export const CommandHubView = () => {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            {filteredSql.map(item => (
-              <div key={item.id} className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px", padding: "20px" }}>
+            {filteredSql.map((item, idx) => (
+              <div key={item.id} className="panel-card hoverable animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "14px", padding: "20px", animationDelay: `${Math.min(idx * 0.05, 0.4)}s`, animationFillMode: "backwards" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", borderBottom: "1px solid var(--border-color)", paddingBottom: "12px" }}>
                   <div>
                     <span style={{ fontFamily: "monospace", fontSize: "0.75rem", fontWeight: 800, color: "#e2574c", backgroundColor: "rgba(226, 87, 76, 0.15)", padding: "2px 8px", borderRadius: "4px", marginRight: "10px" }}>
@@ -397,8 +406,8 @@ export const CommandHubView = () => {
 
       {/* TAB 4: MALHA DE PREÇOS, ETIQUETAS & MCD */}
       {activeTab === "malha" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          
+        <div key="malha" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+
           {/* Section 1: Fluxo de Atuação da Malha (Interactive Diagram) */}
           <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "24px" }}>
             <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-main)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
@@ -475,8 +484,11 @@ export const CommandHubView = () => {
                             cursor: "pointer",
                             backgroundColor: row.status === "OK" ? "rgba(34, 197, 94, 0.15)" : row.status === "PROCESSANDO" ? "rgba(59, 130, 246, 0.15)" : row.status === "ATENCAO" ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)",
                             color: row.status === "OK" ? "#22c55e" : row.status === "PROCESSANDO" ? "#60a5fa" : row.status === "ATENCAO" ? "#f59e0b" : "#ef4444",
-                            border: row.status === "OK" ? "1px solid rgba(34, 197, 94, 0.3)" : row.status === "PROCESSANDO" ? "1px solid rgba(59, 130, 246, 0.3)" : row.status === "ATENCAO" ? "1px solid rgba(245, 158, 11, 0.3)" : "1px solid rgba(239, 68, 68, 0.3)"
+                            border: row.status === "OK" ? "1px solid rgba(34, 197, 94, 0.3)" : row.status === "PROCESSANDO" ? "1px solid rgba(59, 130, 246, 0.3)" : row.status === "ATENCAO" ? "1px solid rgba(245, 158, 11, 0.3)" : "1px solid rgba(239, 68, 68, 0.3)",
+                            transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                           }}
+                          onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.06)"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                         >
                           {row.status === "OK" ? "🟢 OK" : row.status === "PROCESSANDO" ? "🔵 PROCESSANDO" : row.status === "ATENCAO" ? "🟡 ATENÇÃO" : "🔴 ATRASADO"}
                         </button>
@@ -522,8 +534,8 @@ export const CommandHubView = () => {
 
       {/* TAB 5: MANUAL DO PAPEL DA COMMAND CENTER */}
       {activeTab === "manual" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          
+        <div key="manual" className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+
           {/* Visual Diagram: General Operational Flow of Command Center */}
           <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "24px", background: "linear-gradient(180deg, rgba(200,55,45,0.08) 0%, var(--paper) 70%)" }}>
             <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-main)", margin: 0, display: "flex", alignItems: "center", gap: "10px" }}>
@@ -580,8 +592,8 @@ export const CommandHubView = () => {
               { num: "9", title: "Fechamento de Plantão e Passagem de Turno", desc: "Consolidação de ocorrências, envio do relatório por e-mail, relação Gnet, cobranças pendentes >4h e destaque de incidentes críticos." },
               { num: "10", title: "Apoio Operacional e Contingência", desc: "Tratativa de lojas isoladas, validação prévia antes de acionar Field, solicitação de atendimento presencial e solicitação de modem 4G." },
               { num: "11", title: "Malha de Preços, Etiquetas e MCD", desc: "Acompanhamento de Preços Regulares/Promocionais, Syncros, GDB, Linx, Symphony, Profimetrics Pre-batch/Labels, MCD Grids 1-4 SP, Pacheco, Polos e Troco/Sangria." }
-            ].map(sec => (
-              <div key={sec.num} className="panel-card" style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            ].map((sec, idx) => (
+              <div key={sec.num} className="panel-card hoverable animate-fade-in" style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "10px", animationDelay: `${Math.min(idx * 0.04, 0.4)}s`, animationFillMode: "backwards" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <span style={{ width: "26px", height: "26px", borderRadius: "50%", backgroundColor: "var(--accent-red)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "0.8rem", flexShrink: 0 }}>
                     {sec.num}
