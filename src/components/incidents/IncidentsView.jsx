@@ -74,8 +74,8 @@ export const IncidentsView = () => {
 
       {/* Incident List */}
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {filteredIncidents.map(inc => (
-          <div key={inc.id} className="panel-card hoverable" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+        {filteredIncidents.map((inc, idx) => (
+          <div key={inc.id} className="panel-card hoverable animate-fade-in" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", animationDelay: `${Math.min(idx * 0.04, 0.3)}s`, animationFillMode: "backwards" }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
                 <span className={`status-badge ${inc.severity}`}>{inc.severity.toUpperCase()}</span>

@@ -89,7 +89,7 @@ export const DashboardView = () => {
 
       {/* KPI Cards Row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-        <div className="panel-card" style={{ borderLeft: "4px solid #ef4444" }}>
+        <div className="panel-card hoverable animate-fade-in" style={{ borderLeft: "4px solid #ef4444", animationDelay: "0s", animationFillMode: "backwards" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>
             <span>Incidentes Ativos</span>
             <AlertTriangle size={18} style={{ color: "#ef4444" }} />
@@ -102,7 +102,7 @@ export const DashboardView = () => {
           </p>
         </div>
 
-        <div className="panel-card" style={{ borderLeft: "4px solid #f59e0b" }}>
+        <div className="panel-card hoverable animate-fade-in" style={{ borderLeft: "4px solid #f59e0b", animationDelay: "0.05s", animationFillMode: "backwards" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>
             <span>Em Acompanhamento</span>
             <Clock size={18} style={{ color: "#f59e0b" }} />
@@ -115,7 +115,7 @@ export const DashboardView = () => {
           </p>
         </div>
 
-        <div className="panel-card" style={{ borderLeft: "4px solid #10b981" }}>
+        <div className="panel-card hoverable animate-fade-in" style={{ borderLeft: "4px solid #10b981", animationDelay: "0.1s", animationFillMode: "backwards" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>
             <span>Normalizados Hoje</span>
             <CheckCircle2 size={18} style={{ color: "#10b981" }} />
@@ -128,7 +128,7 @@ export const DashboardView = () => {
           </p>
         </div>
 
-        <div className="panel-card" style={{ borderLeft: "4px solid #387fef" }}>
+        <div className="panel-card hoverable animate-fade-in" style={{ borderLeft: "4px solid #387fef", animationDelay: "0.15s", animationFillMode: "backwards" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>
             <span>Comunicados Emitidos</span>
             <Megaphone size={18} style={{ color: "#387fef" }} />
@@ -141,7 +141,7 @@ export const DashboardView = () => {
           </p>
         </div>
 
-        <div className="panel-card" style={{ borderLeft: "4px solid #8b5cf6" }}>
+        <div className="panel-card hoverable animate-fade-in" style={{ borderLeft: "4px solid #8b5cf6", animationDelay: "0.2s", animationFillMode: "backwards" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase" }}>
             <span>Tempo Médio (MTTR)</span>
             <TrendingUp size={18} style={{ color: "#8b5cf6" }} />
@@ -170,9 +170,10 @@ export const DashboardView = () => {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {activeIncidents.map(inc => (
+            {activeIncidents.map((inc, idx) => (
               <div
                 key={inc.id}
+                className="animate-fade-in"
                 style={{
                   backgroundColor: "var(--bg-dark-hover)",
                   border: "1px solid var(--border-color)",
@@ -181,8 +182,13 @@ export const DashboardView = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  gap: "16px"
+                  gap: "16px",
+                  transition: "border-color 0.2s ease, transform 0.2s ease",
+                  animationDelay: `${Math.min(idx * 0.05, 0.3)}s`,
+                  animationFillMode: "backwards"
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--border-hover)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border-color)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
@@ -244,8 +250,8 @@ export const DashboardView = () => {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            {incidents.flatMap(i => i.timeline.map(t => ({ ...t, incidentId: i.id, system: i.system }))).sort((a, b) => b.time.localeCompare(a.time)).slice(0, 5).map(evt => (
-              <div key={evt.id} style={{ display: "flex", gap: "12px", fontSize: "0.82rem" }}>
+            {incidents.flatMap(i => i.timeline.map(t => ({ ...t, incidentId: i.id, system: i.system }))).sort((a, b) => b.time.localeCompare(a.time)).slice(0, 5).map((evt, idx) => (
+              <div key={evt.id} className="animate-fade-in" style={{ display: "flex", gap: "12px", fontSize: "0.82rem", animationDelay: `${Math.min(idx * 0.05, 0.3)}s`, animationFillMode: "backwards" }}>
                 <div style={{ width: "48px", fontWeight: 700, color: "#2f6ea8", flexShrink: 0 }}>
                   {evt.time}
                 </div>

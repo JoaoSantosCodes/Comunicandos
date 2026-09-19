@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { 
-  ClipboardCheck, Clock, ShieldCheck, Server, Wifi, AlertCircle, CheckCircle2,
-  Send, Copy, Check, User, RefreshCw, Layers, FileText, CheckSquare, Flame
+  ClipboardCheck, Clock, Server, Copy, Check, User, RefreshCw
 } from "lucide-react";
 import { useIncidentContext } from "../../context/useIncidentContext";
 
@@ -75,11 +74,41 @@ export const ShiftMonitoringView = () => {
 📞 *Escalonamentos Ativos:* ${handoverForm.activeEscalations}
 📝 *Observações:* ${handoverForm.generalNotes}`;
 
-  const handleCopyHandover = () => {
-    navigator.clipboard.writeText(formattedHandoverText);
-    setCopiedHandover(true);
-    showToast("Passagem de turno copiada para a área de transferência!");
-    setTimeout(() => setCopiedHandover(false), 2000);
+  const handleCopyHandover = async () => {
+    let success = false;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(formattedHandoverText);
+        success = true;
+      }
+    } catch {
+      // Fallback para contextos onde a Clipboard API é bloqueada
+    }
+
+    if (!success) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = formattedHandoverText;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        success = document.execCommand("copy");
+        document.body.removeChild(textArea);
+      } catch (err) {
+        console.error("Erro ao copiar passagem de turno:", err);
+      }
+    }
+
+    if (success) {
+      setCopiedHandover(true);
+      showToast("Passagem de turno copiada para a área de transferência!");
+      setTimeout(() => setCopiedHandover(false), 2000);
+    } else {
+      showToast("Não foi possível copiar automaticamente.", "error");
+    }
   };
 
   return (
@@ -114,6 +143,8 @@ export const ShiftMonitoringView = () => {
             <button
               key={tb.id}
               onClick={() => setActiveSubTab(tb.id)}
+              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = "var(--bg-dark-hover)"; }}
+              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = "transparent"; }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -126,7 +157,9 @@ export const ShiftMonitoringView = () => {
                 fontWeight: isActive ? 700 : 500,
                 fontSize: "0.85rem",
                 cursor: "pointer",
-                borderBottom: isActive ? "2px solid #10b981" : "2px solid transparent"
+                borderBottom: isActive ? "2px solid #10b981" : "2px solid transparent",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: isActive ? "translateY(-1px)" : "translateY(0)"
               }}
             >
               <Icon size={16} />
@@ -138,7 +171,7 @@ export const ShiftMonitoringView = () => {
 
       {/* TAB 1: DAILY INFRASTRUCTURE CHECKLIST */}
       {activeSubTab === "daily" && (
-        <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "24px" }}>
+        <div key="daily" className="panel-card animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "24px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-main)", margin: 0 }}>
@@ -165,15 +198,14 @@ export const ShiftMonitoringView = () => {
                 </tr>
               </thead>
               <tbody>
-                {dailyChecklist.map(item => (
-                  <tr key={item.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                {dailyChecklist.map((item, idx) => (
+                  <tr key={item.id} className="animate-fade-in" style={{ borderBottom: "1px solid var(--border-color)", animationDelay: `${Math.min(idx * 0.05, 0.3)}s`, animationFillMode: "backwards" }}>
                     <td style={{ padding: "12px 10px", color: "var(--text-muted)", fontWeight: 600 }}>{item.category}</td>
                     <td style={{ padding: "12px 10px", color: "var(--text-main)", fontWeight: 700 }}>{item.name}</td>
                     <td style={{ padding: "12px 10px" }}>
                       <button
                         onClick={() => toggleDailyStatus(item.id)}
                         style={{
-                          border: "none",
                           borderRadius: "6px",
                           padding: "4px 12px",
                           fontSize: "0.75rem",
@@ -181,8 +213,11 @@ export const ShiftMonitoringView = () => {
                           cursor: "pointer",
                           backgroundColor: item.status === "OK" ? "rgba(34, 197, 94, 0.15)" : item.status === "ATENCAO" ? "rgba(245, 158, 11, 0.15)" : "rgba(239, 68, 68, 0.15)",
                           color: item.status === "OK" ? "#22c55e" : item.status === "ATENCAO" ? "#f59e0b" : "#ef4444",
-                          border: item.status === "OK" ? "1px solid rgba(34, 197, 94, 0.3)" : item.status === "ATENCAO" ? "1px solid rgba(245, 158, 11, 0.3)" : "1px solid rgba(239, 68, 68, 0.3)"
+                          border: item.status === "OK" ? "1px solid rgba(34, 197, 94, 0.3)" : item.status === "ATENCAO" ? "1px solid rgba(245, 158, 11, 0.3)" : "1px solid rgba(239, 68, 68, 0.3)",
+                          transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
                         }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.06)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
                       >
                         {item.status === "OK" ? "🟢 OK" : item.status === "ATENCAO" ? "🟡 ATENÇÃO" : "🔴 CRÍTICO"}
                       </button>
@@ -209,7 +244,7 @@ export const ShiftMonitoringView = () => {
 
       {/* TAB 2: ROTINA DA MADRUGADA (00h00) */}
       {activeSubTab === "madrugada" && (
-        <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "24px" }}>
+        <div key="madrugada" className="panel-card animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "24px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-main)", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>
@@ -223,9 +258,10 @@ export const ShiftMonitoringView = () => {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {madrugadaRoutine.map(item => (
-              <div 
+            {madrugadaRoutine.map((item, idx) => (
+              <div
                 key={item.id}
+                className="animate-fade-in"
                 onClick={() => toggleMadrugadaTask(item.id)}
                 style={{
                   backgroundColor: item.done ? "rgba(16, 185, 129, 0.08)" : "var(--bg-dark-hover)",
@@ -235,8 +271,13 @@ export const ShiftMonitoringView = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  cursor: "pointer"
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease, border-color 0.2s ease",
+                  animationDelay: `${Math.min(idx * 0.05, 0.3)}s`,
+                  animationFillMode: "backwards"
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateX(3px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateX(0)"; }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{ 
@@ -258,7 +299,7 @@ export const ShiftMonitoringView = () => {
                   </span>
                 </div>
 
-                <span style={{ fontSize: "0.78rem", fontWeight: 700, color: item.done ? "#10b981" : "var(--text-muted)", backgroundColor: "var(--chrome)", padding: "4px 10px", borderRadius: "6px", border: "1px solid var(--border-color)" }}>
+                <span style={{ fontSize: "0.78rem", fontWeight: 700, color: item.done ? "#10b981" : "var(--text-muted)", backgroundColor: "var(--paper)", padding: "4px 10px", borderRadius: "6px", border: "1px solid var(--border-color)" }}>
                   {item.done ? `Concluído (${item.time})` : "Pendente"}
                 </span>
               </div>
@@ -276,7 +317,7 @@ export const ShiftMonitoringView = () => {
 
       {/* TAB 3: SHIFT HANDOVER (PASSAGEM DE TURNO) */}
       {activeSubTab === "handover" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+        <div key="handover" className="animate-fade-in" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           
           {/* Left: Handover Form */}
           <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "14px", padding: "24px" }}>

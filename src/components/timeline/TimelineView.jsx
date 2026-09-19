@@ -25,9 +25,9 @@ export const TimelineView = () => {
       <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px", position: "relative", paddingLeft: "32px" }}>
         <div style={{ position: "absolute", left: "15px", top: "20px", bottom: "20px", width: "2px", backgroundColor: "var(--border-hover)" }}></div>
 
-        {allEvents.map(evt => (
-          <div key={evt.id} style={{ position: "relative", display: "flex", flexDirection: "column", gap: "4px" }}>
-            <div style={{ position: "absolute", left: "-24px", top: "4px", width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#387fef", border: "3px solid var(--paper)" }}></div>
+        {allEvents.map((evt, idx) => (
+          <div key={evt.id} className="animate-fade-in" style={{ position: "relative", display: "flex", flexDirection: "column", gap: "4px", animationDelay: `${Math.min(idx * 0.04, 0.3)}s`, animationFillMode: "backwards" }}>
+            <div style={{ position: "absolute", left: "-24px", top: "4px", width: "14px", height: "14px", borderRadius: "50%", backgroundColor: "#387fef", border: "3px solid var(--paper)", transition: "transform 0.2s ease", animation: idx === 0 ? "sidebarPulse 2s ease-in-out infinite" : "none" }}></div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ fontWeight: 800, color: "#2f6ea8", fontSize: "0.9rem" }}>{evt.time}</span>
               <span style={{ fontWeight: 700, color: "var(--text-main)", fontSize: "0.95rem" }}>{evt.title}</span>
