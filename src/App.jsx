@@ -26,6 +26,7 @@ const AuditView = lazy(() => import("./components/audit/AuditView").then(m => ({
 const SettingsView = lazy(() => import("./components/settings/SettingsView").then(m => ({ default: m.SettingsView })));
 const ProcessosPOPsView = lazy(() => import("./components/knowledge/ProcessosPOPsView").then(m => ({ default: m.ProcessosPOPsView })));
 const ShiftMonitoringView = lazy(() => import("./components/operations/ShiftMonitoringView").then(m => ({ default: m.ShiftMonitoringView })));
+const CommandHubView = lazy(() => import("./components/operations/CommandHubView").then(m => ({ default: m.CommandHubView })));
 
 const LoadingFallback = () => (
   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "350px", gap: "16px", color: "var(--text-muted)" }}>
@@ -59,6 +60,8 @@ const MainLayout = () => {
         return <PublishingCentralView />;
       case "crisis-room":
         return <CrisisRoomView />;
+      case "command-hub":
+        return <CommandHubView />;
       case "shift-monitoring":
         return <ShiftMonitoringView />;
       case "pops-kb":

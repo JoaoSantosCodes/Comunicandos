@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useIncidentContext } from "../../context/useIncidentContext";
 import {
   LayoutDashboard,
+  Monitor,
   AlertTriangle,
   PlusCircle,
   Clock,
@@ -37,6 +38,7 @@ export const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
       title: "OPERAÇÃO NOC",
       items: [
         { id: "dashboard", label: "Dashboard NOC", icon: LayoutDashboard, badge: activeCount ? activeCount : null },
+        { id: "command-hub", label: "Hub de Telas & SQL", icon: Monitor, isNew: true, badge: "14 TELAS" },
         { id: "incidents", label: "Incidentes", icon: AlertTriangle, badge: criticalCount ? `${criticalCount} P1` : null, badgeColor: "bg-red-500" },
         { id: "wizard", label: "Novo Incidente", icon: PlusCircle, isHighlight: true },
         { id: "timeline", label: "Timeline", icon: Clock },
